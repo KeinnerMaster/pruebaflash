@@ -52,14 +52,6 @@ const productos = [
         stock: 80 
     },
     { 
-  id: 90, 
-  nombre: "Mouse gamer prueba de agg prod", 
-  precio: 90.00, 
-  imagen: "file:///C:/Users/usuario/Desktop/P%C3%A1gina%20FlashBuy/Logos/banner.svg", 
-  categoria: "Ropa", 
-  stock: 100 
-},
-    { 
         id: 9, 
         nombre: "Sudadera con Capucha", 
         precio: 69.90, 
@@ -127,6 +119,14 @@ const productos = [
         categoria: "Utensilios", 
         stock: 100 
     },
+    { 
+  id: 90, 
+  nombre: "Mouse gamer prueba de agg prod", 
+  precio: 90.00, 
+  imagen: "file:///C:/Users/usuario/Desktop/P%C3%A1gina%20FlashBuy/Logos/banner.svg", 
+  categoria: "Ropa", 
+  stock: 100 
+},
     { 
         id: 15, 
         nombre: "Set de Cuchillos Premium", 
