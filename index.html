@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FlashBuy — Tienda</title>
+  <title>FlashBuy – Tienda Online</title>
+  <meta name="description" content="Ofertas rápidas, envíos seguros. Los mejores productos al mejor precio.">
   <link rel="stylesheet" href="css/style.css" />
   <link rel="icon" href="/flashbuy-logo.svg" type="image/svg+xml">
   <meta name="theme-color" content="#FF7A00">
@@ -11,19 +12,19 @@
 <body>
   <header>
     <div class="brand">
-      <img src="flashbuy-logo.svg" alt="FlashBuy" class="logo" />
+      <img src="flashbuy-logo.svg" alt="FlashBuy Logo" class="logo" />
       <h1>FlashBuy</h1>
     </div>
 
     <nav class="desktop">
       <a href="index.html">Inicio</a>
-      <a href="#" onclick="renderProducts();return false;">Todos</a>
-      <a href="#" class="cat-link" data-cat="Tecnologia" onclick="renderProducts('Tecnologia');return false;">Tecnologia</a>
-      <a href="#" class="cat-link" data-cat="Ropa" onclick="renderProducts('Ropa');return false;">Ropa</a>
-      <a href="#" class="cat-link" data-cat="Accesorios" onclick="renderProducts('Accesorios');return false;">Accesorios</a>
-      <a href="#" class="cat-link" data-cat="Utensilios" onclick="renderProducts('Utensilios');return false;">Utensilios</a>
+      <a href="#productos" onclick="renderProducts();return false;">Todos</a>
+      <a href="#productos" class="cat-link" data-cat="Tecnologia" onclick="renderProducts('Tecnologia');return false;">Tecnología</a>
+      <a href="#productos" class="cat-link" data-cat="Ropa" onclick="renderProducts('Ropa');return false;">Ropa</a>
+      <a href="#productos" class="cat-link" data-cat="Accesorios" onclick="renderProducts('Accesorios');return false;">Accesorios</a>
+      <a href="#productos" class="cat-link" data-cat="Utensilios" onclick="renderProducts('Utensilios');return false;">Utensilios</a>
       <a href="contacto.html">Contacto</a>
-      <a href="carrito.html">Carrito</a>
+      <a href="carrito.html">🛒 Carrito</a>
     </nav>
 
     <button id="hamburger-btn" class="hamburger" aria-label="Abrir menú">☰</button>
@@ -34,12 +35,13 @@
     <button id="mobile-menu-close" class="close-btn" aria-label="Cerrar menú">✕</button>
     <nav>
       <a href="index.html">Inicio</a>
-      <a href="#" data-cat="Tecnologia" onclick="renderProducts('Tecnologia');return false;">Tecnologia</a>
-      <a href="#" data-cat="Ropa" onclick="renderProducts('Ropa');return false;">Ropa</a>
-      <a href="#" data-cat="Accesorios" onclick="renderProducts('Accesorios');return false;">Accesorios</a>
-      <a href="#" data-cat="Utensilios" onclick="renderProducts('Utensilios');return false;">Utensilios</a>
+      <a href="#productos" onclick="renderProducts();return false;">Todos los Productos</a>
+      <a href="#productos" data-cat="Tecnologia" onclick="renderProducts('Tecnologia');return false;">Tecnología</a>
+      <a href="#productos" data-cat="Ropa" onclick="renderProducts('Ropa');return false;">Ropa</a>
+      <a href="#productos" data-cat="Accesorios" onclick="renderProducts('Accesorios');return false;">Accesorios</a>
+      <a href="#productos" data-cat="Utensilios" onclick="renderProducts('Utensilios');return false;">Utensilios</a>
       <a href="contacto.html">Contacto</a>
-      <a href="carrito.html">Carrito</a>
+      <a href="carrito.html">🛒 Carrito</a>
     </nav>
   </aside>
 
@@ -51,20 +53,22 @@
         <a class="cta" href="#productos">Comprar ahora</a>
       </div>
       <div class="hero-img">
-        <img src="assets/hero-right.png" alt="Producto destacado" style="width:100%;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,15,0.12)">
+        <img src="assets/hero-right.png" alt="Producto destacado" />
       </div>
     </div>
   </section>
 
   <section id="productos" class="productos">
     <h3>Productos destacados</h3>
-    <div id="product-list" class="galeria"></div>
+    <div id="product-list" class="galeria">
+      <!-- Los productos se cargan dinámicamente con JavaScript -->
+    </div>
   </section>
 
-  <a class="whatsapp-button" href="https://wa.me/5511999999999?text=Hola%20quiero%20informaci%C3%B3n" target="_blank" aria-label="Contactar por WhatsApp">💬</a>
+  <a class="whatsapp-button" href="https://wa.me/5511999999999?text=Hola%20quiero%20información" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">💬</a>
 
-  <footer style="padding:30px;text-align:center;color:#666;">
-    © 2025 FlashBuy — Entrega rápida • Pago seguro • Satisfacción garantizada
+  <footer>
+    © 2025 FlashBuy – Entrega rápida • Pago seguro • Satisfacción garantizada
   </footer>
 
   <script src="js/productos.js"></script>
