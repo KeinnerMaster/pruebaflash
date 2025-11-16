@@ -124,7 +124,7 @@ const productos = [
   nombre: "Mouse gamer prueba de agg prod", 
   precio: 90.00, 
   imagen: "file:///C:/Users/usuario/Desktop/P%C3%A1gina%20FlashBuy/Logos/banner.svg", 
-  categoria: "Ropa", 
+  categoria: "Tecnologia", 
   stock: 100 
 },
     { 
