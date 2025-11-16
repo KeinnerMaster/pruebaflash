@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FlashBuy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="/flashbuy-logo.svg" type="image/svg+xml">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="flashbuy-logo.svg" alt="FlashBuy" class="logo" />
+      <h1>FlashBuy</h1>
+    </div>
+    <nav class="desktop">
+      <a href="index.html">Inicio</a>
+      <a href="#" onclick="renderProducts();return false;">Todos</a>
+      <a href="#" class="cat-link" data-cat="Tecnologia" onclick="renderProducts('Tecnologia');return false;">Tecnologia</a>
+      <a href="#" class="cat-link" data-cat="Ropa" onclick="renderProducts('Ropa');return false;">Ropa</a>
+      <a href="#" class="cat-link" data-cat="Accesorios" onclick="renderProducts('Accesorios');return false;">Accesorios</a>
+      <a href="#" class="cat-link" data-cat="Utensilios" onclick="renderProducts('Utensilios');return false;">Utensilios</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="carrito.html">Carrito</a>
+    </nav>
+    <button id="hamburger-btn" class="hamburger" aria-label="Abrir menú">☰</button>
+  </header>
+
+  <aside id="mobile-menu" class="mobile-menu" aria-hidden="true">
+    <button id="mobile-menu-close" class="close-btn" aria-label="Cerrar menú">✕</button>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="#" data-cat="Tecnologia" onclick="renderProducts('Tecnologia');return false;">Tecnologia</a>
+      <a href="#" data-cat="Ropa" onclick="renderProducts('Ropa');return false;">Ropa</a>
+      <a href="#" data-cat="Accesorios" onclick="renderProducts('Accesorios');return false;">Accesorios</a>
+      <a href="#" data-cat="Utensilios" onclick="renderProducts('Utensilios');return false;">Utensilios</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="carrito.html">Carrito</a>
+    </nav>
+  </aside>
+
+  <main style="padding:30px;max-width:1100px;margin:0 auto;">
+    <h2>Tu Carrito</h2>
+    <p>Aquí verás tus productos seleccionados.</p>
+    <p>Métodos de pago: Nequi, Daviplata, Contraentrega.</p>
+    <p>Para finalizar el pedido, comunícate por <a href="https://wa.me/573001112222?text=Hola%20quiero%20finalizar%20mi%20compra" target="_blank">WhatsApp</a>.</p>
+  </main>
+
+  <footer style="padding:30px;text-align:center;color:#666;">
+    © 2025 FlashBuy — Entrega rápida • Pago seguro
+  </footer>
+
+  <script src="js/productos.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/carrito.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FlashBuy — Tienda</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="/flashbuy-logo.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#FF7A00">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="flashbuy-logo.svg" alt="FlashBuy" class="logo" />
+      <h1>FlashBuy</h1>
+    </div>
+
+    <nav class="desktop">
+      <a href="index.html">Inicio</a>
+      <a href="#" onclick="renderProducts();return false;">Todos</a>
+      <a href="#" class="cat-link" data-cat="Tecnologia" onclick="renderProducts('Tecnologia');return false;">Tecnologia</a>
+      <a href="#" class="cat-link" data-cat="Ropa" onclick="renderProducts('Ropa');return false;">Ropa</a>
+      <a href="#" class="cat-link" data-cat="Accesorios" onclick="renderProducts('Accesorios');return false;">Accesorios</a>
+      <a href="#" class="cat-link" data-cat="Utensilios" onclick="renderProducts('Utensilios');return false;">Utensilios</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="carrito.html">Carrito</a>
+    </nav>
+
+    <button id="hamburger-btn" class="hamburger" aria-label="Abrir menú">☰</button>
+  </header>
+
+  <!-- mobile menu -->
+  <aside id="mobile-menu" class="mobile-menu" aria-hidden="true">
+    <button id="mobile-menu-close" class="close-btn" aria-label="Cerrar menú">✕</button>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="#" data-cat="Tecnologia" onclick="renderProducts('Tecnologia');return false;">Tecnologia</a>
+      <a href="#" data-cat="Ropa" onclick="renderProducts('Ropa');return false;">Ropa</a>
+      <a href="#" data-cat="Accesorios" onclick="renderProducts('Accesorios');return false;">Accesorios</a>
+      <a href="#" data-cat="Utensilios" onclick="renderProducts('Utensilios');return false;">Utensilios</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="carrito.html">Carrito</a>
+    </nav>
+  </aside>
+
+  <section class="hero" role="banner" aria-label="Ofertas FlashBuy">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <h2>Ofertas rápidas, envíos seguros</h2>
+        <p>Productos tendencia al mejor precio. Envío confiable y atención por WhatsApp.</p>
+        <a class="cta" href="#productos">Comprar ahora</a>
+      </div>
+      <div class="hero-img">
+        <img src="assets/hero-right.png" alt="Producto destacado" style="width:100%;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,15,0.12)">
+      </div>
+    </div>
+  </section>
+
+  <section id="productos" class="productos">
+    <h3>Productos destacados</h3>
+    <div id="product-list" class="galeria"></div>
+  </section>
+
+  <a class="whatsapp-button" href="https://wa.me/5511999999999?text=Hola%20quiero%20informaci%C3%B3n" target="_blank" aria-label="Contactar por WhatsApp">💬</a>
+
+  <footer style="padding:30px;text-align:center;color:#666;">
+    © 2025 FlashBuy — Entrega rápida • Pago seguro • Satisfacción garantizada
+  </footer>
+
+  <script src="js/productos.js"></script>
+  <script src="js/nav.js"></script>
+</body>
+</html>
