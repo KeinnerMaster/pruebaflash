@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Productos - FlashBuy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="/flashbuy-logo.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#FF7A00">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="flashbuy-logo.svg" alt="FlashBuy Logo" class="logo" />
+      <h1>FlashBuy</h1>
+    </div>
+
+    <nav class="desktop">
+      <a href="index.html">Inicio</a>
+      <a href="productos.html" class="active">Todos</a>
+      <a href="productos.html?categoria=Tecnologia" class="cat-link" data-cat="Tecnologia">Tecnología</a>
+      <a href="productos.html?categoria=Ropa" class="cat-link" data-cat="Ropa">Ropa</a>
+      <a href="productos.html?categoria=Accesorios" class="cat-link" data-cat="Accesorios">Accesorios</a>
+      <a href="productos.html?categoria=Utensilios" class="cat-link" data-cat="Utensilios">Utensilios</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="carrito.html">🛒 Carrito</a>
+    </nav>
+
+    <button id="hamburger-btn" class="hamburger" aria-label="Abrir menú">☰</button>
+  </header>
+
+  <aside id="mobile-menu" class="mobile-menu" aria-hidden="true">
+    <button id="mobile-menu-close" class="close-btn" aria-label="Cerrar menú">✕</button>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="productos.html">Todos los Productos</a>
+      <a href="productos.html?categoria=Tecnologia">Tecnología</a>
+      <a href="productos.html?categoria=Ropa">Ropa</a>
+      <a href="productos.html?categoria=Accesorios">Accesorios</a>
+      <a href="productos.html?categoria=Utensilios">Utensilios</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="carrito.html">🛒 Carrito</a>
+    </nav>
+  </aside>
+
+  <section class="productos" style="padding-top: 40px;">
+    <h3 id="categoria-title">Todos los productos</h3>
+    <div id="product-list" class="galeria">
+      <!-- Los productos se cargan dinámicamente -->
+    </div>
+  </section>
+
+  <a class="whatsapp-button" href="https://wa.me/573156599566?text=Hola%20quiero%20información%20sobre%20productos" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">💬</a>
+
+  <footer>
+    © 2025 FlashBuy – Entrega rápida • Pago seguro • Satisfacción garantizada
+  </footer>
+
+  <script src="js/productos.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    // Cargar productos según categoría de URL
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const categoria = urlParams.get('categoria');
+      
+      if (categoria) {
+        document.getElementById('categoria-title').textContent = `Categoría: ${categoria}`;
+        renderProducts(categoria);
+        
+        // Marcar categoría activa
+        document.querySelectorAll('.cat-link').forEach(link => {
+          if (link.getAttribute('data-cat') === categoria) {
+            link.classList.add('active');
+          }
+        });
+      } else {
+        renderProducts();
+      }
+    });
+  </script>
+</body>
+</html>
