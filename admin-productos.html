@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin - Gestión de Productos | FlashBuy</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .admin-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    .admin-header {
+      background: #0B1320;
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    .form-section {
+      background: #f8f9fa;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+    .btn-primary {
+      background: #FF7A00;
+      color: white;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: #ff8c1a;
+    }
+    .productos-list {
+      display: grid;
+      gap: 20px;
+    }
+    .producto-item {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .producto-item img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    .producto-info {
+      flex: 1;
+    }
+    .producto-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-edit {
+      background: #0B1320;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-delete {
+      background: #ff4444;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .alert {
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .alert-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="flashbuy-logo-white.svg" alt="FlashBuy" class="logo" style="width: 200px; height: auto;" />
+    </div>
+    <nav class="desktop">
+      <a href="index.html">Ver Tienda</a>
+      <a href="admin-productos.html" style="background: rgba(255,122,0,0.2); color: #FF7A00;">Admin Productos</a>
+    </nav>
+  </header>
+
+  <div class="admin-container">
+    <div class="admin-header">
+      <h1>🛠️ Panel de Administración - Productos</h1>
+      <p>Gestiona el catálogo de productos de FlashBuy</p>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>💡 Instrucción:</strong> Los productos se guardan en el archivo <code>js/productos.js</code>. 
+      Usa este panel para generar el código y luego copia/pega en ese archivo.
+    </div>
+
+    <!-- Formulario para agregar/editar producto -->
+    <div class="form-section">
+      <h2>➕ Agregar Nuevo Producto</h2>
+      <form id="productoForm">
+        <div class="form-group">
+          <label>ID del Producto *</label>
+          <input type="number" id="producto_id" required placeholder="Ej: 18">
+        </div>
+
+        <div class="form-group">
+          <label>Nombre del Producto *</label>
+          <input type="text" id="producto_nombre" required placeholder="Ej: Mouse Gamer RGB">
+        </div>
+
+        <div class="form-group">
+          <label>Precio (R$) *</label>
+          <input type="number" id="producto_precio" step="0.01" required placeholder="Ej: 79.90">
+        </div>
+
+        <div class="form-group">
+          <label>URL de la Imagen *</label>
+          <input type="url" id="producto_imagen" required placeholder="https://images.unsplash.com/photo-...">
+          <small style="color:#666;">Puedes usar Unsplash: https://unsplash.com/s/photos/tu-producto</small>
+        </div>
+
+        <div class="form-group">
+          <label>Categoría *</label>
+          <select id="producto_categoria" required>
+            <option value="">Seleccionar...</option>
+            <option value="Tecnologia">Tecnología</option>
+            <option value="Ropa">Ropa</option>
+            <option value="Accesorios">Accesorios</option>
+            <option value="Utensilios">Utensilios</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Stock Disponible *</label>
+          <input type="number" id="producto_stock" required placeholder="Ej: 50">
+        </div>
+
+        <button type="submit" class="btn-primary">➕ Generar Código del Producto</button>
+      </form>
+    </div>
+
+    <!-- Área de código generado -->
+    <div id="codigoGenerado" style="display:none;" class="form-section">
+      <h2>📋 Código Generado</h2>
+      <div class="alert alert-success">
+        ✅ Código generado correctamente. Copia este objeto y agrégalo al array de productos en <code>js/productos.js</code>
+      </div>
+      <textarea id="codigoProducto" readonly style="width:100%;height:200px;font-family:monospace;padding:15px;"></textarea>
+      <button onclick="copiarCodigo()" class="btn-primary" style="margin-top:10px;">📋 Copiar Código</button>
+    </div>
+
+    <!-- Lista de productos actuales -->
+    <div class="form-section">
+      <h2>📦 Productos Actuales</h2>
+      <p style="color:#666;margin-bottom:20px;">Estos son los productos que tienes actualmente en tu tienda:</p>
+      <div id="listaProductos" class="productos-list"></div>
+    </div>
+  </div>
+
+  <script src="js/productos.js"></script>
+  <script>
+    // Generar código del producto
+    document.getElementById('productoForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const id = document.getElementById('producto_id').value;
+      const nombre = document.getElementById('producto_nombre').value;
+      const precio = parseFloat(document.getElementById('producto_precio').value);
+      const imagen = document.getElementById('producto_imagen').value;
+      const categoria = document.getElementById('producto_categoria').value;
+      const stock = parseInt(document.getElementById('producto_stock').value);
+
+      const codigo = `{ 
+  id: ${id}, 
+  nombre: "${nombre}", 
+  precio: ${precio.toFixed(2)}, 
+  imagen: "${imagen}", 
+  categoria: "${categoria}", 
+  stock: ${stock} 
+}`;
+
+      document.getElementById('codigoProducto').value = codigo;
+      document.getElementById('codigoGenerado').style.display = 'block';
+      
+      // Scroll al código
+      document.getElementById('codigoGenerado').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    function copiarCodigo() {
+      const texto = document.getElementById('codigoProducto');
+      texto.select();
+      document.execCommand('copy');
+      alert('✅ Código copiado al portapapeles!');
+    }
+
+    // Mostrar productos actuales
+    function cargarProductosActuales() {
+      const lista = document.getElementById('listaProductos');
+      lista.innerHTML = '';
+      
+      if (typeof productos === 'undefined') {
+        lista.innerHTML = '<p>No se pudieron cargar los productos.</p>';
+        return;
+      }
+
+      productos.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'producto-item';
+        div.innerHTML = `
+          <img src="${p.imagen}" alt="${p.nombre}">
+          <div class="producto-info">
+            <h4>${p.nombre}</h4>
+            <p><strong>ID:</strong> ${p.id} | <strong>Precio:</strong> R$ ${p.precio.toFixed(2)} | <strong>Stock:</strong> ${p.stock}</p>
+            <p><strong>Categoría:</strong> ${p.categoria}</p>
+          </div>
+          <div class="producto-actions">
+            <button class="btn-edit" onclick="editarProducto(${p.id})">✏️ Editar</button>
+            <button class="btn-delete" onclick="mostrarCodigoEliminar(${p.id})">🗑️ Eliminar</button>
+          </div>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    function editarProducto(id) {
+      const producto = productos.find(p => p.id === id);
+      if (!producto) return;
+      
+      document.getElementById('producto_id').value = producto.id;
+      document.getElementById('producto_nombre').value = producto.nombre;
+      document.getElementById('producto_precio').value = producto.precio;
+      document.getElementById('producto_imagen').value = producto.imagen;
+      document.getElementById('producto_categoria').value = producto.categoria;
+      document.getElementById('producto_stock').value = producto.stock;
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function mostrarCodigoEliminar(id) {
+      alert(`Para eliminar el producto con ID ${id}:\n\n1. Abre js/productos.js\n2. Busca el objeto con id: ${id}\n3. Elimina ese objeto completo del array\n4. Guarda el archivo`);
+    }
+
+    // Cargar productos al iniciar
+    document.addEventListener('DOMContentLoaded', cargarProductosActuales);
+  </script>
+</body>
+</html>
