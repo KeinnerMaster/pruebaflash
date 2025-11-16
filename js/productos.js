@@ -128,6 +128,14 @@ const productos = [
         stock: 50 
     },
     { 
+  id: 90, 
+  nombre: "Mouse gamer prueba de agg prod", 
+  precio: 90.00, 
+  imagen: "file:///C:/Users/usuario/Desktop/P%C3%A1gina%20FlashBuy/Logos/banner.svg", 
+  categoria: "Ropa", 
+  stock: 100 
+}
+    { 
         id: 16, 
         nombre: "Licuadora Portátil", 
         precio: 54.90, 
