@@ -129,11 +129,11 @@ nav.desktop a.active {
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    min-height: 480px; 
+    min-height: 550px; 
     color: #fff; 
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     position: relative;
-    padding: 40px 20px;
+    padding: 60px 20px;
 }
 
 /* Overlay oscuro para mejor legibilidad */
@@ -150,7 +150,7 @@ nav.desktop a.active {
     z-index: 2; 
     max-width: 1100px; 
     width: 100%;
-    padding: 20px; 
+    padding: 30px; 
     display: flex; 
     gap: 40px; 
     align-items: center;
@@ -163,7 +163,7 @@ nav.desktop a.active {
 }
 
 .hero h2 { 
-    font-size: 42px; 
+    font-size: 46px; 
     margin: 0 0 16px 0;
     line-height: 1.2;
 }
@@ -171,7 +171,7 @@ nav.desktop a.active {
 .hero p { 
     margin: 0 0 24px 0; 
     opacity: 0.95;
-    font-size: 18px;
+    font-size: 19px;
     line-height: 1.6;
 }
 
@@ -196,7 +196,7 @@ nav.desktop a.active {
 .hero .hero-img { 
     flex: 0 0 auto;
     width: 100%;
-    max-width: 400px;
+    max-width: 450px;
 }
 
 .hero .hero-img img {
