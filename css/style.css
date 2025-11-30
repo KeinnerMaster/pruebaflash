@@ -21,7 +21,8 @@ body {
 .announcement-content {
     display: inline-block;
     white-space: nowrap;
-    animation: scroll-left 25s linear infinite;
+    animation: scroll-left 45s linear infinite; /* Velocidad mucho más lenta */
+    animation-delay: 0s; /* Empieza inmediatamente */
 }
 
 .announcement-text {
@@ -30,9 +31,14 @@ body {
     padding-right: 50px;
 }
 
+/* Animación */
 @keyframes scroll-left {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
+    0% { 
+        transform: translateX(100%); 
+    }
+    100% { 
+        transform: translateX(-100%); 
+    }
 }
 
 /* --- Header / nav --- */
