@@ -10,9 +10,17 @@
   <meta name="theme-color" content="#FF7A00">
 </head>
 <body>
+  <!-- Barra de anuncio animada -->
+  <div class="announcement-bar">
+    <div class="announcement-content">
+      <span class="announcement-text">VISITA NUESTRO SHOWROOM EN MEDELLÍN COLOMBIA CALLE 51A#78B-34 LOS COLORES • ENVÍOS A TODA COLOMBIA • PAGO CONTRA ENTREGA DISPONIBLE • GARANTÍA EN TODOS LOS PRODUCTOS</span>
+      <span class="announcement-text">VISITA NUESTRO SHOWROOM EN MEDELLÍN COLOMBIA CALLE 51A#78B-34 LOS COLORES • ENVÍOS A TODA COLOMBIA • PAGO CONTRA ENTREGA DISPONIBLE • GARANTÍA EN TODOS LOS PRODUCTOS</span>
+    </div>
+  </div>
+
   <header>
     <div class="brand">
-      <img src="flashbuy-logo-white.svg" alt="FlashBuy" class="logo" style="width: 240px; height: auto;" />
+      <img src="flashbuy-logo-white.svg" alt="FlashBuy" class="logo" style="width: 200px; height: auto;" />
     </div>
 
     <nav class="desktop">
@@ -44,25 +52,35 @@
     </nav>
   </aside>
 
-  <section class="hero" role="banner" aria-label="Ofertas FlashBuy">
-    <div class="hero-inner">
-      <div class="hero-copy">
-        <h2 style="color:#fff;">🎧 Audífonos In-Ear Pro</h2>
-        <p class="hero-price" style="font-size:32px;font-weight:bold;color:#FFD700;margin:16px 0;">R$ 89,90</p>
-        <p style="color:#fff;">Sonido premium con cancelación de ruido. Batería de larga duración y diseño ergonómico. ¡El compañero perfecto para tu día!</p>
-        <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;">
-          <button onclick="agregar(2)" class="cta" style="cursor:pointer;border:none;font-size:16px;">
+  <!-- Banner personalizable -->
+  <section class="custom-banner">
+    <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1400&h=400&fit=crop&q=80" alt="Banner FlashBuy - Ofertas Especiales" class="banner-image" />
+  </section>
+
+  <!-- Producto destacado -->
+  <section class="featured-product">
+    <div class="featured-inner">
+      <div class="featured-image">
+        <img src="https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=600&fit=crop&q=80" alt="Audífonos In-Ear Pro - Producto Destacado" />
+        <span class="badge-destacado">⭐ DESTACADO</span>
+      </div>
+      <div class="featured-info">
+        <h2>🎧 Audífonos In-Ear Pro</h2>
+        <p class="featured-price">R$ 89,90</p>
+        <p class="featured-description">Sonido premium con cancelación de ruido. Batería de larga duración y diseño ergonómico. ¡El compañero perfecto para tu día!</p>
+        <ul class="featured-benefits">
+          <li>✓ Cancelación activa de ruido</li>
+          <li>✓ Batería de hasta 24 horas</li>
+          <li>✓ Resistente al agua IPX4</li>
+          <li>✓ Envío gratis en compras mayores a R$ 200</li>
+        </ul>
+        <div class="featured-actions">
+          <button onclick="agregar(2)" class="btn-add-cart">
             🛒 Agregar al carrito
           </button>
-          <a class="cta" href="productos.html?categoria=Tecnologia" style="background:#0B1320;">Ver más tecnología</a>
+          <a href="productos.html?categoria=Tecnologia" class="btn-ver-mas">Ver más tecnología</a>
         </div>
-        <p style="font-size:14px;color:#fff;margin-top:16px;opacity:0.9;">
-          ✓ Envío gratis en compras mayores a R$ 200<br>
-          ✓ Stock disponible: 60 unidades
-        </p>
-      </div>
-      <div class="hero-img">
-        <img src="https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800&h=600&fit=crop&q=80" alt="Audífonos In-Ear Pro - Producto Destacado" />
+        <p class="featured-stock">📦 Stock disponible: 60 unidades</p>
       </div>
     </div>
   </section>
