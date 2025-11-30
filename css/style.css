@@ -21,42 +21,37 @@ body {
 .announcement-content {
     display: flex;
     white-space: nowrap;
-    animation: scroll-left 12s linear infinite;
+    animation: scroll-left 12s linear infinite; /* Ajusta la velocidad aquí */
 }
 
 /* Texto original */
 .announcement-text {
     color: #fff;
     font-size: 14px;
+    font-weight: 400;
     padding-right: 50px;
     display: inline-block;
+    line-height: 1;
 }
 
-/* Duplicar el texto automáticamente */
+/* Texto duplicado: 100% mismo estilo */
 .announcement-content::after {
     content: attr(data-text);
     color: #fff;
     font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
     padding-left: 50px;
-}
-
-/* Animación continua */
-@keyframes scroll-left {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-    }
+    display: inline-block;
 }
 
 /* Animación */
 @keyframes scroll-left {
-    0% { 
-        transform: translateX(100%); 
+    0% {
+        transform: translateX(100%);
     }
-    100% { 
-        transform: translateX(-100%); 
+    100% {
+        transform: translateX(-100%);
     }
 }
 
