@@ -19,16 +19,35 @@ body {
 }
 
 .announcement-content {
-    display: inline-block;
+    display: flex;
     white-space: nowrap;
-    animation: scroll-left 45s linear infinite; /* Velocidad mucho más lenta */
-    animation-delay: 0s; /* Empieza inmediatamente */
+    animation: scroll-left 45s linear infinite;
 }
 
+/* Texto original */
 .announcement-text {
     color: #fff;
     font-size: 14px;
     padding-right: 50px;
+    display: inline-block;
+}
+
+/* Duplicar el texto automáticamente */
+.announcement-content::after {
+    content: attr(data-text);
+    color: #fff;
+    font-size: 14px;
+    padding-left: 50px;
+}
+
+/* Animación continua */
+@keyframes scroll-left {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
 }
 
 /* Animación */
