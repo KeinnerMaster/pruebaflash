@@ -7,6 +7,34 @@ body {
     overflow-x: hidden;
 }
 
+/* --- Barra de anuncio animada --- */
+.announcement-bar {
+    width: 100%;
+    background: #000;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 10px 0;
+    position: relative;
+    z-index: 200;
+}
+
+.announcement-content {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scroll-left 25s linear infinite;
+}
+
+.announcement-text {
+    color: #fff;
+    font-size: 14px;
+    padding-right: 50px;
+}
+
+@keyframes scroll-left {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
 /* --- Header / nav --- */
 header { 
     display: flex; 
@@ -117,7 +145,7 @@ nav.desktop a.active {
     justify-content: center;
 }
 
-/* --- NUEVO: Banner personalizable --- */
+/* --- Banner personalizable --- */
 .custom-banner {
     width: 100%;
     max-height: 500px;
@@ -133,7 +161,7 @@ nav.desktop a.active {
     max-height: 500px;
 }
 
-/* --- NUEVO: Producto destacado rediseñado --- */
+/* --- Producto destacado rediseñado --- */
 .featured-product {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     padding: 60px 20px;
@@ -257,9 +285,7 @@ nav.desktop a.active {
     font-size: 15px;
 }
 
-/* hero/banner - ELIMINADO (reemplazado por featured-product) */
-
-/* product section */
+/* Sección de productos */
 .productos { 
     padding: 60px 20px; 
     max-width: 1200px; 
@@ -403,8 +429,9 @@ form button:hover {
     background: #ff8c1a;
 }
 
-/* --- RESPONSIVE --- */
+/* RESPONSIVE */
 @media (max-width: 900px) {
+
     nav.desktop { 
         display: none; 
     }
@@ -470,10 +497,6 @@ form button:hover {
     
     .brand .logo {
         width: 160px;
-    }
-    
-    .announcement-bar {
-        padding: 10px 0;
     }
     
     .custom-banner .banner-image {
