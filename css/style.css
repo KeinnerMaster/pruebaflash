@@ -20,7 +20,7 @@ body {
 .announcement-content {
     display: inline-flex;
     white-space: nowrap;
-    animation: scroll-left 20s linear infinite;
+    animation: scroll-left 35s linear infinite;
 }
 
 /* Texto duplicado REAL */
