@@ -16,13 +16,16 @@ body {
     padding: 10px 0;
 }
 
+/* El truco: empezamos el texto APENAS un poquito fuera de pantalla,
+   así entra rápido incluso en pantallas pequeñas */
 .announcement-content {
     display: inline-flex;
     white-space: nowrap;
-    animation: scroll-left 12s linear infinite;
+    animation: scroll-left 18s linear infinite;
+    transform: translateX(10%); /* ENTRADA INMEDIATA */
 }
 
-/* Texto duplicado con variables */
+/* Texto duplicado */
 .announcement-content .txt {
     color: #fff;
     font-size: 14px;
@@ -32,18 +35,35 @@ body {
     display: inline-block;
 }
 
-/* Ambos spans usan exactamente el MISMO texto */
 .announcement-content .txt::before {
     content: var(--text);
 }
 
-/* Animación */
+/* Animación principal */
 @keyframes scroll-left {
     0% {
-        transform: translateX(100%);
+        transform: translateX(10%); /* empieza casi visible */
     }
     100% {
-        transform: translateX(-100%);
+        transform: translateX(-110%); /* recorre y sale */
+    }
+}
+
+/* ----- OPTIMIZACIÓN ESPECIAL PARA MÓVIL ----- */
+@media (max-width: 600px) {
+
+    .announcement-content {
+        animation-duration: 14s !important; /* más rápido en pantallas pequeñas */
+        transform: translateX(5%) !important; /* entra aún más rápido */
+    }
+
+    @keyframes scroll-left {
+        0% {
+            transform: translateX(5%);
+        }
+        100% {
+            transform: translateX(-120%);
+        }
     }
 }
 
