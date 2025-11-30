@@ -21,7 +21,7 @@ body {
 .announcement-content {
     display: inline-block;
     white-space: nowrap;
-    animation: scroll-left 35s linear infinite; /* Lento mas Rapido menos */
+    animation: scroll-left 45s linear infinite; /* Velocidad mucho más lenta */
     animation-delay: 0s; /* Empieza inmediatamente */
 }
 
