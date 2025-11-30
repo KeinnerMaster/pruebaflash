@@ -21,6 +21,7 @@ body {
     display: inline-flex;
     white-space: nowrap;
     animation: scroll-left 65s linear infinite;
+    min-width: 200%; /* <-- evita aceleración en móvil */
 }
 
 /* Texto duplicado REAL */
@@ -40,17 +41,18 @@ body {
 /* Animación principal: empieza inmediatamente visible */
 @keyframes scroll-left {
     0% {
-        transform: translateX(0);     /* YA visible al inicio */
+        transform: translateX(0);
     }
     100% {
-        transform: translateX(-100%); /* Recorrido completo */
+        transform: translateX(-50%);
     }
 }
 
 /* ----- Ajuste especial para móvil ----- */
 @media (max-width: 600px) {
     .announcement-content {
-        animation-duration: 14s !important; /* un poco más rápido */
+        animation-duration: 40s !important; /* velocidad lenta y estable */
+        min-width: 200% !important; /* asegura recorrido largo */
     }
 }
 
