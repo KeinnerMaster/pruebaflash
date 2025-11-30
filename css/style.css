@@ -16,22 +16,20 @@ body {
     padding: 10px 0;
 }
 
-/* El truco: empezamos el texto APENAS un poquito fuera de pantalla,
-   así entra rápido incluso en pantallas pequeñas */
+/* Contenedor del texto */
 .announcement-content {
     display: inline-flex;
     white-space: nowrap;
-    animation: scroll-left 18s linear infinite;
-    transform: translateX(10%); /* ENTRADA INMEDIATA */
+    animation: scroll-left 12s linear infinite;
 }
 
-/* Texto duplicado */
+/* Texto duplicado REAL */
 .announcement-content .txt {
     color: #fff;
     font-size: 14px;
     font-weight: 400;
     line-height: 1;
-    padding-right: 50px;
+    padding-right: 60px;
     display: inline-block;
 }
 
@@ -39,31 +37,20 @@ body {
     content: var(--text);
 }
 
-/* Animación principal */
+/* Animación principal: empieza inmediatamente visible */
 @keyframes scroll-left {
     0% {
-        transform: translateX(10%); /* empieza casi visible */
+        transform: translateX(0);     /* YA visible al inicio */
     }
     100% {
-        transform: translateX(-110%); /* recorre y sale */
+        transform: translateX(-100%); /* Recorrido completo */
     }
 }
 
-/* ----- OPTIMIZACIÓN ESPECIAL PARA MÓVIL ----- */
+/* ----- Ajuste especial para móvil ----- */
 @media (max-width: 600px) {
-
     .announcement-content {
-        animation-duration: 14s !important; /* más rápido en pantallas pequeñas */
-        transform: translateX(5%) !important; /* entra aún más rápido */
-    }
-
-    @keyframes scroll-left {
-        0% {
-            transform: translateX(5%);
-        }
-        100% {
-            transform: translateX(-120%);
-        }
+        animation-duration: 14s !important; /* un poco más rápido */
     }
 }
 
