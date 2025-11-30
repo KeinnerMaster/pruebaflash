@@ -555,4 +555,21 @@ form button:hover {
         right: 16px;
         bottom: 16px;
     }
+    /* Fix definitivo para que "Ver más tecnología" NO se salga en móviles */
+@media (max-width: 600px) {
+    .featured-actions {
+        width: 100% !important;
+        padding: 0 !important;
+        gap: 12px !important;
+        box-sizing: border-box;
+    }
+
+    .btn-ver-mas,
+    .btn-add-cart {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        display: block !important;
+    }
 }
