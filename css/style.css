@@ -117,87 +117,147 @@ nav.desktop a.active {
     justify-content: center;
 }
 
-/* hero/banner - CORREGIDO */
-.hero { 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    min-height: 550px; 
-    color: #fff; 
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* --- NUEVO: Banner personalizable --- */
+.custom-banner {
+    width: 100%;
+    max-height: 500px;
+    overflow: hidden;
     position: relative;
+}
+
+.custom-banner .banner-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    max-height: 500px;
+}
+
+/* --- NUEVO: Producto destacado rediseñado --- */
+.featured-product {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     padding: 60px 20px;
 }
 
-/* Overlay oscuro para mejor legibilidad */
-.hero::after { 
-    content: ''; 
-    position: absolute; 
-    inset: 0; 
-    background: linear-gradient(180deg, rgba(11, 19, 32, 0.4) 0%, rgba(11, 19, 32, 0.6) 100%);
-    pointer-events: none;
-}
-
-.hero .hero-inner { 
-    position: relative; 
-    z-index: 2; 
-    max-width: 1100px; 
-    width: 100%;
-    padding: 30px; 
-    display: flex; 
-    gap: 40px; 
+.featured-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
     align-items: center;
-    flex-wrap: wrap;
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
 }
 
-.hero .hero-copy { 
-    flex: 1;
-    min-width: 300px;
+.featured-image {
+    position: relative;
 }
 
-.hero h2 { 
-    font-size: 46px; 
-    margin: 0 0 16px 0;
-    line-height: 1.2;
-}
-
-.hero p { 
-    margin: 0 0 24px 0; 
-    opacity: 0.95;
-    font-size: 19px;
-    line-height: 1.6;
-}
-
-.cta { 
-    display: inline-block; 
-    background: #FF7A00; 
-    color: #fff; 
-    padding: 14px 28px; 
-    border-radius: 8px; 
-    text-decoration: none; 
-    font-weight: 600; 
-    box-shadow: 0 6px 20px rgba(255, 122, 0, 0.3);
-    transition: all 0.3s ease;
-}
-
-.cta:hover {
-    background: #ff8c1a;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255, 122, 0, 0.4);
-}
-
-.hero .hero-img { 
-    flex: 0 0 auto;
-    width: 100%;
-    max-width: 450px;
-}
-
-.hero .hero-img img {
+.featured-image img {
     width: 100%;
     height: auto;
     border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
 }
+
+.badge-destacado {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: #FF7A00;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 15px rgba(255,122,0,0.3);
+}
+
+.featured-info h2 {
+    font-size: 36px;
+    margin: 0 0 16px 0;
+    color: #0B1320;
+}
+
+.featured-price {
+    font-size: 42px;
+    font-weight: bold;
+    color: #FF7A00;
+    margin: 0 0 20px 0;
+}
+
+.featured-description {
+    font-size: 18px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.featured-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+}
+
+.featured-benefits li {
+    padding: 8px 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.featured-actions {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.btn-add-cart {
+    background: #FF7A00;
+    color: white;
+    padding: 16px 32px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255,122,0,0.3);
+}
+
+.btn-add-cart:hover {
+    background: #ff8c1a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,122,0,0.4);
+}
+
+.btn-ver-mas {
+    background: #0B1320;
+    color: white;
+    padding: 16px 32px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.btn-ver-mas:hover {
+    background: #1a2942;
+    transform: translateY(-2px);
+}
+
+.featured-stock {
+    color: #25D366;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* hero/banner - ELIMINADO (reemplazado por featured-product) */
 
 /* product section */
 .productos { 
@@ -353,27 +413,40 @@ form button:hover {
         display: block; 
     }
     
-    .hero { 
-        min-height: 400px;
+    .announcement-text {
+        font-size: 12px;
+    }
+    
+    .custom-banner .banner-image {
+        max-height: 300px;
+    }
+    
+    .featured-inner {
+        grid-template-columns: 1fr;
+        gap: 30px;
         padding: 30px 20px;
     }
     
-    .hero .hero-inner {
-        flex-direction: column;
-        text-align: center;
-        gap: 30px;
+    .featured-info h2 {
+        font-size: 28px;
     }
     
-    .hero h2 { 
-        font-size: 32px; 
+    .featured-price {
+        font-size: 32px;
     }
     
-    .hero p {
+    .featured-description {
         font-size: 16px;
     }
     
-    .hero .hero-img {
-        max-width: 100%;
+    .featured-actions {
+        flex-direction: column;
+    }
+    
+    .btn-add-cart,
+    .btn-ver-mas {
+        width: 100%;
+        text-align: center;
     }
     
     .productos {
@@ -396,24 +469,33 @@ form button:hover {
     }
     
     .brand .logo {
-        width: 44px;
+        width: 160px;
     }
     
-    .brand h1 {
-        font-size: 18px;
+    .announcement-bar {
+        padding: 10px 0;
     }
     
-    .hero h2 {
-        font-size: 26px;
+    .custom-banner .banner-image {
+        max-height: 200px;
     }
     
-    .hero p {
-        font-size: 15px;
+    .featured-product {
+        padding: 40px 16px;
     }
     
-    .cta {
-        padding: 12px 24px;
-        font-size: 15px;
+    .featured-info h2 {
+        font-size: 24px;
+    }
+    
+    .featured-price {
+        font-size: 28px;
+    }
+    
+    .btn-add-cart,
+    .btn-ver-mas {
+        padding: 14px 24px;
+        font-size: 16px;
     }
     
     .productos h3 {
