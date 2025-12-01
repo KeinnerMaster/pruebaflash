@@ -7,25 +7,60 @@
   <link rel="stylesheet" href="css/style.css" />
   <style>
     .admin-container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 40px auto;
       padding: 20px;
     }
     .admin-header {
-      background: #0B1320;
+      background: linear-gradient(135deg, #0B1320 0%, #1a2332 100%);
       color: white;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 30px;
-    }
-    .form-section {
-      background: #f8f9fa;
       padding: 30px;
       border-radius: 12px;
       margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .admin-header h1 {
+      margin: 0 0 10px 0;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .stat-card h3 {
+      margin: 0 0 10px 0;
+      color: #666;
+      font-size: 14px;
+    }
+    .stat-card .number {
+      font-size: 32px;
+      font-weight: bold;
+      color: #FF7A00;
+    }
+    .form-section {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
     }
     .form-group {
       margin-bottom: 20px;
+    }
+    .form-group.full-width {
+      grid-column: 1 / -1;
     }
     .form-group label {
       display: block;
@@ -38,10 +73,23 @@
     .form-group textarea {
       width: 100%;
       padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
       font-size: 15px;
       box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #FF7A00;
+    }
+    .form-group small {
+      display: block;
+      color: #666;
+      margin-top: 5px;
+      font-size: 13px;
     }
     .btn-primary {
       background: #FF7A00;
@@ -52,9 +100,21 @@
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.3s;
     }
     .btn-primary:hover {
-      background: #ff8c1a;
+      background: #e66d00;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3);
+    }
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-left: 10px;
     }
     .productos-list {
       display: grid;
@@ -63,55 +123,181 @@
     .producto-item {
       background: white;
       padding: 20px;
-      border-radius: 8px;
-      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      border: 2px solid #e0e0e0;
       display: flex;
       gap: 20px;
-      align-items: center;
+      align-items: flex-start;
+      transition: all 0.3s;
+    }
+    .producto-item:hover {
+      border-color: #FF7A00;
+      box-shadow: 0 4px 12px rgba(255, 122, 0, 0.2);
     }
     .producto-item img {
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       object-fit: cover;
-      border-radius: 6px;
+      border-radius: 8px;
     }
     .producto-info {
       flex: 1;
     }
+    .producto-info h4 {
+      margin: 0 0 10px 0;
+      color: #333;
+    }
+    .producto-meta {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+    .meta-tag {
+      background: #f0f0f0;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: #666;
+    }
     .producto-actions {
       display: flex;
       gap: 10px;
+      flex-direction: column;
     }
     .btn-edit {
       background: #0B1320;
       color: white;
-      padding: 8px 16px;
+      padding: 10px 20px;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-edit:hover {
+      background: #1a2332;
     }
     .btn-delete {
-      background: #ff4444;
+      background: #dc3545;
       color: white;
-      padding: 8px 16px;
+      padding: 10px 20px;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-delete:hover {
+      background: #c82333;
     }
     .alert {
-      padding: 15px;
-      border-radius: 6px;
+      padding: 15px 20px;
+      border-radius: 8px;
       margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .alert-success {
       background: #d4edda;
       color: #155724;
-      border: 1px solid #c3e6cb;
+      border: 2px solid #c3e6cb;
     }
     .alert-info {
       background: #d1ecf1;
       color: #0c5460;
-      border: 1px solid #bee5eb;
+      border: 2px solid #bee5eb;
+    }
+    .alert-warning {
+      background: #fff3cd;
+      color: #856404;
+      border: 2px solid #ffeaa7;
+    }
+    .images-input-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .image-input-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .image-input-group input {
+      flex: 1;
+    }
+    .btn-remove-image {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn-add-image {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+    .color-input-container,
+    .size-input-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .color-input-group {
+      display: grid;
+      grid-template-columns: 2fr 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .size-input-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .size-tag {
+      background: #e0e0e0;
+      padding: 8px 15px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .size-tag button {
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .producto-item {
+        flex-direction: column;
+      }
+      .producto-actions {
+        flex-direction: row;
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -121,170 +307,472 @@
       <img src="flashbuy-logo-white.svg" alt="FlashBuy" class="logo" style="width: 200px; height: auto;" />
     </div>
     <nav class="desktop">
-      <a href="index.html">Tienda</a>
-      <a href="admin-data001.html" style="background: rgba(255,122,0,0.2); color: #FF7A00;">Admin Productos</a>
+      <a href="index.html">🏠 Tienda</a>
+      <a href="productos.html">📦 Productos</a>
+      <a href="admin-data001.html" style="background: rgba(255,122,0,0.2); color: #FF7A00;">⚙️ Admin</a>
     </nav>
   </header>
 
   <div class="admin-container">
     <div class="admin-header">
-      <h1>🛠️ Panel de Administración - Productos</h1>
-      <p>Gestioón del catálogo de productos | FlashBuy</p>
+      <h1>🛠️ Panel de Administración</h1>
+      <p>Gestión completa del catálogo de productos FlashBuy</p>
     </div>
 
-    <div class="alert alert-info">
-      <strong>💡 Instrucción:</strong> Los productos se guardan en el archivo <code>js/productos.js</code>. 
-      Usa este panel para generar el código y luego copia/pega en ese archivo.
+    <!-- Estadísticas -->
+    <div class="stats">
+      <div class="stat-card">
+        <h3>Total Productos</h3>
+        <div class="number" id="stat-total">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>En Stock</h3>
+        <div class="number" id="stat-stock">0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Valor Inventario</h3>
+        <div class="number" id="stat-valor">R$ 0</div>
+      </div>
+      <div class="stat-card">
+        <h3>Categorías</h3>
+        <div class="number" id="stat-categorias">0</div>
+      </div>
+    </div>
+
+    <div class="alert alert-warning">
+      <span>⚠️</span>
+      <div>
+        <strong>Importante:</strong> Los cambios se guardan automáticamente en el navegador. 
+        Para que los productos aparezcan en todas las páginas, asegúrate de que <code>productos.js</code> 
+        cargue desde localStorage si está disponible.
+      </div>
     </div>
 
     <!-- Formulario para agregar/editar producto -->
     <div class="form-section">
-      <h2>➕ Agregar Nuevo Producto</h2>
+      <h2 id="form-title">➕ Agregar Nuevo Producto</h2>
       <form id="productoForm">
-        <div class="form-group">
-          <label>ID del Producto *</label>
-          <input type="number" id="producto_id" required placeholder="Ej: 18">
+        <input type="hidden" id="editing_id" value="">
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre del Producto *</label>
+            <input type="text" id="producto_nombre" required placeholder="Ej: Mouse Gamer RGB Pro">
+          </div>
+
+          <div class="form-group">
+            <label>Precio (R$) *</label>
+            <input type="number" id="producto_precio" step="0.01" required placeholder="79.90">
+          </div>
+
+          <div class="form-group">
+            <label>Categoría *</label>
+            <select id="producto_categoria" required>
+              <option value="">Seleccionar...</option>
+              <option value="Tecnologia">Tecnología</option>
+              <option value="Ropa">Ropa</option>
+              <option value="Accesorios">Accesorios</option>
+              <option value="Utensilios">Utensilios</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Stock Disponible *</label>
+            <input type="number" id="producto_stock" required placeholder="50">
+          </div>
+
+          <div class="form-group full-width">
+            <label>Descripción del Producto</label>
+            <textarea id="producto_descripcion" rows="3" placeholder="Descripción detallada del producto, características, beneficios..."></textarea>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Imágenes del Producto *</label>
+            <small>Agrega mínimo 1 imagen. La primera será la imagen principal.</small>
+            <div id="images-container" class="images-input-container">
+              <div class="image-input-group">
+                <input type="url" class="image-url" placeholder="https://images.unsplash.com/photo-..." required>
+              </div>
+            </div>
+            <button type="button" class="btn-add-image" onclick="agregarCampoImagen()">+ Agregar otra imagen</button>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Colores Disponibles (Opcional)</label>
+            <small>Agrega colores con su código hexadecimal</small>
+            <div id="colors-container" class="color-input-container"></div>
+            <button type="button" class="btn-add-image" onclick="agregarCampoColor()">+ Agregar color</button>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Tallas Disponibles (Opcional - para ropa)</label>
+            <small>Escribe una talla y presiona Enter o haz clic en Agregar</small>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <input type="text" id="talla-input" placeholder="Ej: M, L, XL">
+              <button type="button" class="btn-add-image" onclick="agregarTalla()">+ Agregar</button>
+            </div>
+            <div id="tallas-container" class="size-input-group"></div>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>Nombre del Producto *</label>
-          <input type="text" id="producto_nombre" required placeholder="Ej: Mouse Gamer RGB">
+        <div style="margin-top: 30px; display: flex; gap: 10px;">
+          <button type="submit" class="btn-primary" id="btn-submit">💾 Guardar Producto</button>
+          <button type="button" class="btn-secondary" onclick="cancelarEdicion()">❌ Cancelar</button>
         </div>
-
-        <div class="form-group">
-          <label>Precio (R$) *</label>
-          <input type="number" id="producto_precio" step="0.01" required placeholder="Ej: 79.90">
-        </div>
-
-        <div class="form-group">
-          <label>URL de la Imagen *</label>
-          <input type="url" id="producto_imagen" required placeholder="https://images.unsplash.com/photo-...">
-          <small style="color:#666;">Puedes usar Unsplash: https://unsplash.com/s/photos/tu-producto</small>
-        </div>
-
-        <div class="form-group">
-          <label>Categoría *</label>
-          <select id="producto_categoria" required>
-            <option value="">Seleccionar...</option>
-            <option value="Tecnologia">Tecnología</option>
-            <option value="Ropa">Ropa</option>
-            <option value="Accesorios">Accesorios</option>
-            <option value="Utensilios">Utensilios</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Stock Disponible *</label>
-          <input type="number" id="producto_stock" required placeholder="Ej: 50">
-        </div>
-
-        <button type="submit" class="btn-primary">➕ Generar Código del Producto</button>
       </form>
     </div>
 
-    <!-- Área de código generado -->
-    <div id="codigoGenerado" style="display:none;" class="form-section">
-      <h2>📋 Código Generado</h2>
-      <div class="alert alert-success">
-        ✅ Código generado correctamente. Copia este objeto y agrégalo al array de productos en <code>js/productos.js</code>
-      </div>
-      <textarea id="codigoProducto" readonly style="width:100%;height:200px;font-family:monospace;padding:15px;"></textarea>
-      <button onclick="copiarCodigo()" class="btn-primary" style="margin-top:10px;">📋 Copiar Código</button>
-    </div>
-
-    <!-- Lista de productos actuales -->
+    <!-- Lista de productos -->
     <div class="form-section">
-      <h2>📦 Productos Actuales</h2>
-      <p style="color:#666;margin-bottom:20px;">Estos son los productos que tienes actualmente en tu tienda:</p>
+      <h2>📦 Productos en el Catálogo</h2>
       <div id="listaProductos" class="productos-list"></div>
     </div>
   </div>
 
-  <script src="js/productos.js"></script>
   <script>
-    // Generar código del producto
+    // Variables globales
+    let productosAdmin = [];
+    let editingId = null;
+    let tallasArray = [];
+
+    // Cargar productos del localStorage o crear array vacío
+    function cargarProductos() {
+      const saved = localStorage.getItem('flashbuy_productos');
+      if (saved) {
+        productosAdmin = JSON.parse(saved);
+      } else {
+        productosAdmin = [];
+      }
+      actualizarEstadisticas();
+      renderizarProductos();
+    }
+
+    // Guardar productos en localStorage
+    function guardarProductos() {
+      localStorage.setItem('flashbuy_productos', JSON.stringify(productosAdmin));
+      actualizarEstadisticas();
+      renderizarProductos();
+    }
+
+    // Actualizar estadísticas
+    function actualizarEstadisticas() {
+      document.getElementById('stat-total').textContent = productosAdmin.length;
+      
+      const enStock = productosAdmin.filter(p => p.stock > 0).length;
+      document.getElementById('stat-stock').textContent = enStock;
+      
+      const valorTotal = productosAdmin.reduce((sum, p) => sum + (p.precio * p.stock), 0);
+      document.getElementById('stat-valor').textContent = 'R$ ' + valorTotal.toFixed(2);
+      
+      const categorias = [...new Set(productosAdmin.map(p => p.categoria))].length;
+      document.getElementById('stat-categorias').textContent = categorias;
+    }
+
+    // Generar ID único
+    function generarId() {
+      return productosAdmin.length > 0 
+        ? Math.max(...productosAdmin.map(p => p.id)) + 1 
+        : 1;
+    }
+
+    // Agregar campo de imagen
+    function agregarCampoImagen() {
+      const container = document.getElementById('images-container');
+      const div = document.createElement('div');
+      div.className = 'image-input-group';
+      div.innerHTML = `
+        <input type="url" class="image-url" placeholder="https://images.unsplash.com/photo-...">
+        <button type="button" class="btn-remove-image" onclick="this.parentElement.remove()">✕</button>
+      `;
+      container.appendChild(div);
+    }
+
+    // Agregar campo de color
+    function agregarCampoColor() {
+      const container = document.getElementById('colors-container');
+      const div = document.createElement('div');
+      div.className = 'color-input-group';
+      div.innerHTML = `
+        <input type="text" placeholder="Nombre del color (Ej: Negro)" class="color-nombre">
+        <input type="color" class="color-hex" value="#000000">
+        <button type="button" class="btn-remove-image" onclick="this.parentElement.remove()">✕</button>
+      `;
+      container.appendChild(div);
+    }
+
+    // Agregar talla
+    function agregarTalla() {
+      const input = document.getElementById('talla-input');
+      const talla = input.value.trim().toUpperCase();
+      
+      if (!talla) return;
+      if (tallasArray.includes(talla)) {
+        alert('Esta talla ya fue agregada');
+        return;
+      }
+      
+      tallasArray.push(talla);
+      input.value = '';
+      renderizarTallas();
+    }
+
+    // Renderizar tallas
+    function renderizarTallas() {
+      const container = document.getElementById('tallas-container');
+      container.innerHTML = '';
+      
+      tallasArray.forEach(talla => {
+        const tag = document.createElement('div');
+        tag.className = 'size-tag';
+        tag.innerHTML = `
+          ${talla}
+          <button onclick="eliminarTalla('${talla}')">✕</button>
+        `;
+        container.appendChild(tag);
+      });
+    }
+
+    // Eliminar talla
+    function eliminarTalla(talla) {
+      tallasArray = tallasArray.filter(t => t !== talla);
+      renderizarTallas();
+    }
+
+    // Enter para agregar talla
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('talla-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          agregarTalla();
+        }
+      });
+    });
+
+    // Manejar submit del formulario
     document.getElementById('productoForm').addEventListener('submit', function(e) {
       e.preventDefault();
       
-      const id = document.getElementById('producto_id').value;
-      const nombre = document.getElementById('producto_nombre').value;
-      const precio = parseFloat(document.getElementById('producto_precio').value);
-      const imagen = document.getElementById('producto_imagen').value;
-      const categoria = document.getElementById('producto_categoria').value;
-      const stock = parseInt(document.getElementById('producto_stock').value);
-
-      const codigo = `{ 
-  id: ${id}, 
-  nombre: "${nombre}", 
-  precio: ${precio.toFixed(2)}, 
-  imagen: "${imagen}", 
-  categoria: "${categoria}", 
-  stock: ${stock} 
-}`;
-
-      document.getElementById('codigoProducto').value = codigo;
-      document.getElementById('codigoGenerado').style.display = 'block';
+      // Recopilar imágenes
+      const imageInputs = document.querySelectorAll('.image-url');
+      const imagenes = Array.from(imageInputs)
+        .map(input => input.value.trim())
+        .filter(url => url !== '');
       
-      // Scroll al código
-      document.getElementById('codigoGenerado').scrollIntoView({ behavior: 'smooth' });
-    });
-
-    function copiarCodigo() {
-      const texto = document.getElementById('codigoProducto');
-      texto.select();
-      document.execCommand('copy');
-      alert('✅ Código copiado al portapapeles!');
-    }
-
-    // Mostrar productos actuales
-    function cargarProductosActuales() {
-      const lista = document.getElementById('listaProductos');
-      lista.innerHTML = '';
-      
-      if (typeof productos === 'undefined') {
-        lista.innerHTML = '<p>No se pudieron cargar los productos.</p>';
+      if (imagenes.length === 0) {
+        alert('Debes agregar al menos una imagen');
         return;
       }
 
-      productos.forEach(p => {
+      // Recopilar colores
+      const colorGroups = document.querySelectorAll('.color-input-group');
+      const colores = Array.from(colorGroups).map(group => {
+        const nombre = group.querySelector('.color-nombre').value.trim();
+        const hex = group.querySelector('.color-hex').value;
+        return nombre ? { nombre, hex } : null;
+      }).filter(c => c !== null);
+
+      // Crear objeto producto
+      const producto = {
+        id: editingId || generarId(),
+        nombre: document.getElementById('producto_nombre').value.trim(),
+        precio: parseFloat(document.getElementById('producto_precio').value),
+        imagen: imagenes[0], // Primera imagen como principal
+        imagenes: imagenes,
+        categoria: document.getElementById('producto_categoria').value,
+        stock: parseInt(document.getElementById('producto_stock').value),
+        descripcion: document.getElementById('producto_descripcion').value.trim()
+      };
+
+      // Agregar colores si existen
+      if (colores.length > 0) {
+        producto.colores = colores;
+      }
+
+      // Agregar tallas si existen
+      if (tallasArray.length > 0) {
+        producto.tallas = [...tallasArray];
+      }
+
+      // Guardar o actualizar
+      if (editingId) {
+        const index = productosAdmin.findIndex(p => p.id === editingId);
+        productosAdmin[index] = producto;
+        mostrarAlerta('✅ Producto actualizado correctamente', 'success');
+      } else {
+        productosAdmin.push(producto);
+        mostrarAlerta('✅ Producto agregado correctamente', 'success');
+      }
+
+      guardarProductos();
+      limpiarFormulario();
+    });
+
+    // Mostrar alerta
+    function mostrarAlerta(mensaje, tipo) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${tipo}`;
+      alertDiv.innerHTML = `<span>${mensaje}</span>`;
+      
+      const container = document.querySelector('.admin-container');
+      container.insertBefore(alertDiv, container.firstChild);
+      
+      setTimeout(() => alertDiv.remove(), 3000);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Limpiar formulario
+    function limpiarFormulario() {
+      document.getElementById('productoForm').reset();
+      document.getElementById('editing_id').value = '';
+      document.getElementById('form-title').textContent = '➕ Agregar Nuevo Producto';
+      document.getElementById('btn-submit').textContent = '💾 Guardar Producto';
+      editingId = null;
+      tallasArray = [];
+      
+      // Limpiar imágenes extra
+      const imagesContainer = document.getElementById('images-container');
+      imagesContainer.innerHTML = `
+        <div class="image-input-group">
+          <input type="url" class="image-url" placeholder="https://images.unsplash.com/photo-..." required>
+        </div>
+      `;
+      
+      // Limpiar colores
+      document.getElementById('colors-container').innerHTML = '';
+      
+      // Limpiar tallas
+      renderizarTallas();
+    }
+
+    // Cancelar edición
+    function cancelarEdicion() {
+      limpiarFormulario();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Editar producto
+    function editarProducto(id) {
+      const producto = productosAdmin.find(p => p.id === id);
+      if (!producto) return;
+      
+      editingId = id;
+      document.getElementById('form-title').textContent = '✏️ Editar Producto';
+      document.getElementById('btn-submit').textContent = '💾 Actualizar Producto';
+      
+      // Llenar formulario
+      document.getElementById('producto_nombre').value = producto.nombre;
+      document.getElementById('producto_precio').value = producto.precio;
+      document.getElementById('producto_categoria').value = producto.categoria;
+      document.getElementById('producto_stock').value = producto.stock;
+      document.getElementById('producto_descripcion').value = producto.descripcion || '';
+      
+      // Cargar imágenes
+      const imagesContainer = document.getElementById('images-container');
+      imagesContainer.innerHTML = '';
+      (producto.imagenes || [producto.imagen]).forEach((img, index) => {
+        const div = document.createElement('div');
+        div.className = 'image-input-group';
+        div.innerHTML = `
+          <input type="url" class="image-url" value="${img}" ${index === 0 ? 'required' : ''}>
+          ${index > 0 ? '<button type="button" class="btn-remove-image" onclick="this.parentElement.remove()">✕</button>' : ''}
+        `;
+        imagesContainer.appendChild(div);
+      });
+      
+      // Cargar colores
+      const colorsContainer = document.getElementById('colors-container');
+      colorsContainer.innerHTML = '';
+      if (producto.colores) {
+        producto.colores.forEach(color => {
+          const div = document.createElement('div');
+          div.className = 'color-input-group';
+          div.innerHTML = `
+            <input type="text" placeholder="Nombre del color" class="color-nombre" value="${color.nombre}">
+            <input type="color" class="color-hex" value="${color.hex}">
+            <button type="button" class="btn-remove-image" onclick="this.parentElement.remove()">✕</button>
+          `;
+          colorsContainer.appendChild(div);
+        });
+      }
+      
+      // Cargar tallas
+      tallasArray = producto.tallas ? [...producto.tallas] : [];
+      renderizarTallas();
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Eliminar producto
+    function eliminarProducto(id) {
+      if (!confirm('¿Estás seguro de que quieres eliminar este producto?')) return;
+      
+      productosAdmin = productosAdmin.filter(p => p.id !== id);
+      guardarProductos();
+      mostrarAlerta('🗑️ Producto eliminado correctamente', 'success');
+    }
+
+    // Renderizar lista de productos
+    function renderizarProductos() {
+      const lista = document.getElementById('listaProductos');
+      
+      if (productosAdmin.length === 0) {
+        lista.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📦</div>
+            <h3>No hay productos en el catálogo</h3>
+            <p>Comienza agregando tu primer producto usando el formulario de arriba</p>
+          </div>
+        `;
+        return;
+      }
+      
+      lista.innerHTML = '';
+      
+      productosAdmin.forEach(p => {
         const div = document.createElement('div');
         div.className = 'producto-item';
+        
+        const coloresText = p.colores ? `${p.colores.length} colores` : 'Sin colores';
+        const tallasText = p.tallas ? `${p.tallas.length} tallas` : 'Sin tallas';
+        const imagenesText = `${p.imagenes ? p.imagenes.length : 1} imagen(es)`;
+        
         div.innerHTML = `
           <img src="${p.imagen}" alt="${p.nombre}">
           <div class="producto-info">
             <h4>${p.nombre}</h4>
-            <p><strong>ID:</strong> ${p.id} | <strong>Precio:</strong> R$ ${p.precio.toFixed(2)} | <strong>Stock:</strong> ${p.stock}</p>
-            <p><strong>Categoría:</strong> ${p.categoria}</p>
+            <p style="color:#666;margin:5px 0;">${p.descripcion ? p.descripcion.substring(0, 100) + '...' : 'Sin descripción'}</p>
+            <div class="producto-meta">
+              <span class="meta-tag">ID: ${p.id}</span>
+              <span class="meta-tag">💰 R$ ${p.precio.toFixed(2)}</span>
+              <span class="meta-tag">📦 Stock: ${p.stock}</span>
+              <span class="meta-tag">📂 ${p.categoria}</span>
+            </div>
+            <div class="producto-meta">
+              <span class="meta-tag">📸 ${imagenesText}</span>
+              <span class="meta-tag">🎨 ${coloresText}</span>
+              <span class="meta-tag">📏 ${tallasText}</span>
+            </div>
           </div>
           <div class="producto-actions">
             <button class="btn-edit" onclick="editarProducto(${p.id})">✏️ Editar</button>
-            <button class="btn-delete" onclick="mostrarCodigoEliminar(${p.id})">🗑️ Eliminar</button>
+            <button class="btn-delete" onclick="eliminarProducto(${p.id})">🗑️ Eliminar</button>
           </div>
         `;
         lista.appendChild(div);
       });
     }
 
-    function editarProducto(id) {
-      const producto = productos.find(p => p.id === id);
-      if (!producto) return;
-      
-      document.getElementById('producto_id').value = producto.id;
-      document.getElementById('producto_nombre').value = producto.nombre;
-      document.getElementById('producto_precio').value = producto.precio;
-      document.getElementById('producto_imagen').value = producto.imagen;
-      document.getElementById('producto_categoria').value = producto.categoria;
-      document.getElementById('producto_stock').value = producto.stock;
-      
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function mostrarCodigoEliminar(id) {
-      alert(`Para eliminar el producto con ID ${id}:\n\n1. Abre js/productos.js\n2. Busca el objeto con id: ${id}\n3. Elimina ese objeto completo del array\n4. Guarda el archivo`);
-    }
+    // Exponer funciones globalmente
+    window.agregarCampoImagen = agregarCampoImagen;
+    window.agregarCampoColor = agregarCampoColor;
+    window.agregarTalla = agregarTalla;
+    window.eliminarTalla = eliminarTalla;
+    window.editarProducto = editarProducto;
+    window.eliminarProducto = eliminarProducto;
+    window.cancelarEdicion = cancelarEdicion;
 
     // Cargar productos al iniciar
-    document.addEventListener('DOMContentLoaded', cargarProductosActuales);
+    document.addEventListener('DOMContentLoaded', cargarProductos);
   </script>
 </body>
 </html>
