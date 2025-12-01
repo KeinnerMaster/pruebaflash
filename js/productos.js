@@ -1,5 +1,7 @@
-// productos.js - lista completa de productos con todas las categorías
-const productos = [
+// productos.js - Carga productos desde localStorage o usa productos predeterminados
+
+// Productos predeterminados (se usan si no hay nada en localStorage)
+const productosDefault = [
     // TECNOLOGIA
     { 
         id: 1, 
@@ -291,16 +293,40 @@ const productos = [
         categoria: "Utensilios", 
         stock: 85,
         descripcion: "Tabla de cortar de bambú ecológica y duradera. Antibacteriana y amigable con los cuchillos. Fácil de mantener."
-    },
-    { 
-        id: 90, 
-        nombre: "Mouse gamer prueba de agg prod", 
-        precio: 90.00, 
-        imagen: "file:///C:/Users/usuario/Desktop/P%C3%A1gina%20FlashBuy/Logos/banner.svg", 
-        categoria: "Tecnologia", 
-        stock: 100 
     }
 ];
+
+// Cargar productos: primero intenta desde localStorage, si no existe usa los predeterminados
+function cargarProductosDesdeStorage() {
+    const saved = localStorage.getItem('flashbuy_productos');
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (e) {
+            console.error('Error al cargar productos desde localStorage:', e);
+            return productosDefault;
+        }
+    }
+    return productosDefault;
+}
+
+// Array de productos activo
+let productos = cargarProductosDesdeStorage();
+
+// Función para recargar productos (útil si se actualizan desde el admin)
+function recargarProductos() {
+    productos = cargarProductosDesdeStorage();
+    if (typeof renderProducts === 'function') {
+        renderProducts();
+    }
+}
+
+// Escuchar cambios en localStorage
+window.addEventListener('storage', function(e) {
+    if (e.key === 'flashbuy_productos') {
+        recargarProductos();
+    }
+});
 
 function formatBRL(n) {
     return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -321,7 +347,6 @@ function renderProducts(filterCategory) {
     toShow.forEach(p => {
         const div = document.createElement("div");
         div.className = "producto";
-        // Hacer que todo el producto sea clickeable
         div.style.cursor = "pointer";
         div.onclick = () => window.location.href = `detalle-producto.html?id=${p.id}`;
         
@@ -335,7 +360,6 @@ function renderProducts(filterCategory) {
         lista.appendChild(div);
     });
     
-    // Update category selector highlight
     const allLinks = document.querySelectorAll('.cat-link, nav a[data-cat]');
     allLinks.forEach(a => a.classList.remove('active'));
     
@@ -351,7 +375,6 @@ function agregar(id) {
     
     let carrito = JSON.parse(localStorage.getItem('flashbuy_cart') || '[]');
     
-    // Check total quantity of this product in cart
     const existingItem = carrito.find(item => item.id === id);
     const currentQuantity = existingItem ? existingItem.cantidad : 0;
     
@@ -369,11 +392,10 @@ function agregar(id) {
     alert("✓ Producto agregado al carrito: " + p.nombre);
 }
 
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', function() { 
     renderProducts(); 
 });
 
-// Expose functions globally for inline onclick handlers
 window.renderProducts = renderProducts;
 window.agregar = agregar;
+window.recargarProductos = recargarProductos;
