@@ -3,79 +3,205 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Dashboard - FlashBuy Analytics</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <title>Admin Dashboard - FlashBuy</title>
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="f974dcbb-29aa-4518-89ec-ab9e4abce31d"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     
-    .admin-container {
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .admin-header {
-      background: linear-gradient(135deg, #0B1320 0%, #1a2332 100%);
-      color: white;
-      padding: 30px;
-      border-radius: 12px;
-      margin-bottom: 30px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    .admin-header h1 {
-      margin: 0 0 10px 0;
-      font-size: 32px;
-    }
-    
-    /* Tabs Navigation */
-    .tabs-container {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 30px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .tabs-nav {
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
       display: flex;
-      gap: 10px;
-      border-bottom: 2px solid #e0e0e0;
-      padding-bottom: 10px;
-      flex-wrap: wrap;
+      height: 100vh;
+      overflow: hidden;
     }
     
-    .tab-btn {
-      padding: 12px 24px;
-      border: none;
-      background: transparent;
-      color: #666;
-      font-size: 16px;
-      font-weight: 600;
+    /* ============================================
+       SIDEBAR
+    ============================================ */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, #0B1320 0%, #1a2942 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+      transition: transform 0.3s ease;
+    }
+    
+    .sidebar-header {
+      padding: 25px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .sidebar-logo {
+      width: 180px;
+      height: auto;
+    }
+    
+    .sidebar-menu {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 0;
+    }
+    
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px 25px;
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      transition: all 0.3s ease;
       cursor: pointer;
-      border-radius: 8px 8px 0 0;
-      transition: all 0.3s;
-      position: relative;
+      border-left: 4px solid transparent;
+      font-size: 15px;
+      font-weight: 500;
     }
     
-    .tab-btn:hover {
-      background: #f5f5f5;
+    .menu-item:hover {
+      background: rgba(255,255,255,0.05);
+      color: white;
+      border-left-color: #FF7A00;
+    }
+    
+    .menu-item.active {
+      background: rgba(255,122,0,0.15);
       color: #FF7A00;
+      border-left-color: #FF7A00;
     }
     
-    .tab-btn.active {
+    .menu-item-icon {
+      font-size: 20px;
+      width: 24px;
+      text-align: center;
+    }
+    
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #FF7A00;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .user-details {
+      flex: 1;
+    }
+    
+    .user-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .user-role {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+    }
+    
+    /* ============================================
+       MAIN CONTENT
+    ============================================ */
+    .main-content {
+      margin-left: 280px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    .top-bar {
+      background: white;
+      padding: 20px 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .top-bar-left h1 {
+      font-size: 24px;
+      color: #0B1320;
+      margin: 0;
+    }
+    
+    .top-bar-left p {
+      color: #666;
+      font-size: 14px;
+      margin: 5px 0 0 0;
+    }
+    
+    .top-bar-actions {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    
+    .btn-visit-store {
+      padding: 10px 20px;
       background: #FF7A00;
       color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
     }
     
-    .tab-content {
+    .btn-visit-store:hover {
+      background: #e66d00;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255,122,0,0.3);
+    }
+    
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px;
+    }
+    
+    /* ============================================
+       SECTIONS
+    ============================================ */
+    .section {
       display: none;
-      animation: fadeIn 0.3s;
     }
     
-    .tab-content.active {
+    .section.active {
       display: block;
+      animation: fadeIn 0.3s ease;
     }
     
     @keyframes fadeIn {
@@ -83,7 +209,9 @@
       to { opacity: 1; transform: translateY(0); }
     }
     
-    /* Dashboard Stats Cards */
+    /* ============================================
+       STATS CARDS
+    ============================================ */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -95,20 +223,40 @@
       background: white;
       padding: 25px;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
       border-left: 4px solid #FF7A00;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, transparent 0%, rgba(255,122,0,0.05) 100%);
+      border-radius: 0 0 0 100%;
     }
     
     .stat-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
     }
     
     .stat-card.blue { border-left-color: #2196F3; }
+    .stat-card.blue::before { background: linear-gradient(135deg, transparent 0%, rgba(33,150,243,0.05) 100%); }
+    
     .stat-card.green { border-left-color: #4CAF50; }
+    .stat-card.green::before { background: linear-gradient(135deg, transparent 0%, rgba(76,175,80,0.05) 100%); }
+    
     .stat-card.purple { border-left-color: #9C27B0; }
+    .stat-card.purple::before { background: linear-gradient(135deg, transparent 0%, rgba(156,39,176,0.05) 100%); }
+    
     .stat-card.red { border-left-color: #F44336; }
+    .stat-card.red::before { background: linear-gradient(135deg, transparent 0%, rgba(244,67,54,0.05) 100%); }
     
     .stat-card-header {
       display: flex;
@@ -120,40 +268,46 @@
     .stat-card h3 {
       margin: 0;
       color: #666;
-      font-size: 14px;
+      font-size: 13px;
       text-transform: uppercase;
       font-weight: 600;
+      letter-spacing: 0.5px;
     }
     
     .stat-icon {
-      font-size: 32px;
+      font-size: 28px;
       opacity: 0.3;
     }
     
     .stat-number {
-      font-size: 36px;
+      font-size: 32px;
       font-weight: bold;
-      color: #333;
+      color: #0B1320;
       margin: 10px 0;
+      position: relative;
+      z-index: 1;
     }
     
     .stat-change {
-      font-size: 14px;
+      font-size: 13px;
       color: #4CAF50;
       display: flex;
       align-items: center;
       gap: 5px;
+      font-weight: 500;
     }
     
     .stat-change.negative {
       color: #F44336;
     }
     
-    /* Charts Section */
+    /* ============================================
+       CHARTS
+    ============================================ */
     .charts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 25px;
       margin-bottom: 30px;
     }
     
@@ -161,67 +315,218 @@
       background: white;
       padding: 25px;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
     
     .chart-card h3 {
       margin: 0 0 20px 0;
-      color: #333;
+      color: #0B1320;
       font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     
     .chart-card.full-width {
       grid-column: 1 / -1;
     }
     
-    /* Visitors Table */
-    .visitors-table-container {
+    /* ============================================
+       TABLES
+    ============================================ */
+    .table-container {
       background: white;
       border-radius: 12px;
       padding: 25px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       margin-bottom: 30px;
       overflow-x: auto;
     }
     
-    .visitors-table {
-      width: 100%;
-      border-collapse: collapse;
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
     }
     
-    .visitors-table th {
-      background: #f5f5f5;
+    .table-header h3 {
+      margin: 0;
+      font-size: 20px;
+      color: #0B1320;
+      font-weight: 600;
+    }
+    
+    .table-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    
+    .search-box {
+      padding: 10px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      width: 250px;
+      transition: border-color 0.3s;
+    }
+    
+    .search-box:focus {
+      outline: none;
+      border-color: #FF7A00;
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+    }
+    
+    .data-table thead {
+      background: #f8f9fa;
+    }
+    
+    .data-table th {
       padding: 15px;
       text-align: left;
       font-weight: 600;
-      color: #333;
+      color: #0B1320;
       border-bottom: 2px solid #e0e0e0;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     
-    .visitors-table td {
+    .data-table td {
       padding: 15px;
       border-bottom: 1px solid #f0f0f0;
-      color: #666;
+      color: #555;
+      font-size: 14px;
     }
     
-    .visitors-table tr:hover {
-      background: #f9f9f9;
+    .data-table tbody tr {
+      transition: background 0.2s ease;
     }
     
-    .country-flag {
-      font-size: 24px;
-      margin-right: 8px;
+    .data-table tbody tr:hover {
+      background: #f8f9fa;
     }
     
-    /* Products Table */
-    .products-table-container {
-      background: white;
-      border-radius: 12px;
-      padding: 25px;
+    .product-img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      overflow-x: auto;
     }
     
+    .badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .badge.hot {
+      background: #ffebee;
+      color: #c62828;
+    }
+    
+    .badge.trending {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .badge.low-stock {
+      background: #fff3e0;
+      color: #ef6c00;
+    }
+    
+    .badge.new {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+    
+    /* ============================================
+       BUTTONS
+    ============================================ */
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: #FF7A00;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #e66d00;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255,122,0,0.3);
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+    
+    .btn-edit {
+      background: #0B1320;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-edit:hover {
+      background: #1a2942;
+      transform: translateY(-2px);
+    }
+    
+    .btn-delete {
+      background: #dc3545;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-delete:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+    }
+    
+    /* ============================================
+       FILTERS
+    ============================================ */
     .filter-buttons {
       display: flex;
       gap: 10px;
@@ -236,12 +541,17 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      transition: all 0.3s;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
     
     .filter-btn:hover {
       border-color: #FF7A00;
       color: #FF7A00;
+      background: rgba(255,122,0,0.05);
     }
     
     .filter-btn.active {
@@ -250,117 +560,25 @@
       border-color: #FF7A00;
     }
     
-    .products-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    
-    .products-table th {
-      background: #f5f5f5;
-      padding: 15px;
-      text-align: left;
-      font-weight: 600;
-      color: #333;
-      border-bottom: 2px solid #e0e0e0;
-    }
-    
-    .products-table td {
-      padding: 15px;
-      border-bottom: 1px solid #f0f0f0;
-      color: #666;
-    }
-    
-    .products-table tr:hover {
-      background: #f9f9f9;
-    }
-    
-    .product-img {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-    
-    .badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    
-    .badge.hot {
-      background: #ffebee;
-      color: #c62828;
-    }
-    
-    .badge.trending {
-      background: #e8f5e9;
-      color: #2e7d32;
-    }
-    
-    .badge.new {
-      background: #e3f2fd;
-      color: #1565c0;
-    }
-    
-    /* Buttons */
-    .btn-primary {
-      background: #FF7A00;
-      color: white;
-      padding: 14px 28px;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    
-    .btn-primary:hover {
-      background: #e66d00;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3);
-    }
-    
-    .btn-secondary {
-      background: #6c757d;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-left: 10px;
-    }
-    
-    .btn-edit {
-      background: #0B1320;
-      color: white;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      margin-right: 5px;
-    }
-    
-    .btn-delete {
-      background: #dc3545;
-      color: white;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    
-    /* Form Section */
+    /* ============================================
+       FORMS
+    ============================================ */
     .form-section {
       background: white;
       padding: 30px;
       border-radius: 12px;
       margin-bottom: 30px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .form-section h2 {
+      margin: 0 0 25px 0;
+      color: #0B1320;
+      font-size: 22px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     
     .form-grid {
@@ -381,18 +599,20 @@
       display: block;
       font-weight: 600;
       margin-bottom: 8px;
-      color: #333;
+      color: #0B1320;
+      font-size: 14px;
     }
     
     .form-group input,
     .form-group select,
     .form-group textarea {
       width: 100%;
-      padding: 12px;
+      padding: 12px 15px;
       border: 2px solid #e0e0e0;
       border-radius: 8px;
       font-size: 15px;
       transition: border-color 0.3s;
+      font-family: inherit;
     }
     
     .form-group input:focus,
@@ -402,297 +622,641 @@
       border-color: #FF7A00;
     }
     
-    /* Responsive */
-    @media (max-width: 768px) {
-      .form-grid {
-        grid-template-columns: 1fr;
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+    
+    /* ============================================
+       ORDERS SECTION
+    ============================================ */
+    .order-status {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .order-status.pending {
+      background: #fff3e0;
+      color: #ef6c00;
+    }
+    
+    .order-status.processing {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+    
+    .order-status.shipped {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .order-status.delivered {
+      background: #c8e6c9;
+      color: #1b5e20;
+    }
+    
+    .order-status.cancelled {
+      background: #ffebee;
+      color: #c62828;
+    }
+    
+    /* ============================================
+       CUSTOMERS SECTION
+    ============================================ */
+    .customer-segment {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .customer-segment.vip {
+      background: #ffd700;
+      color: #8b6914;
+    }
+    
+    .customer-segment.regular {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+    
+    .customer-segment.new {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    /* ============================================
+       MARKETING SECTION
+    ============================================ */
+    .coupon-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid #FF7A00;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .coupon-code {
+      font-size: 24px;
+      font-weight: bold;
+      color: #FF7A00;
+      font-family: 'Courier New', monospace;
+      margin-bottom: 10px;
+    }
+    
+    .coupon-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .coupon-detail-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    /* ============================================
+       SHIPPING CONFIG
+    ============================================ */
+    .shipping-zone {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid #e0e0e0;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+    }
+    
+    .shipping-zone:hover {
+      border-color: #FF7A00;
+      box-shadow: 0 4px 12px rgba(255,122,0,0.1);
+    }
+    
+    .shipping-zone-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .shipping-zone-header h4 {
+      margin: 0;
+      color: #0B1320;
+      font-size: 18px;
+    }
+    
+    .shipping-rate {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    
+    /* ============================================
+       SETTINGS
+    ============================================ */
+    .settings-section {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .settings-section h3 {
+      margin: 0 0 20px 0;
+      color: #0B1320;
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+    
+    .setting-label {
+      flex: 1;
+    }
+    
+    .setting-label h4 {
+      margin: 0 0 5px 0;
+      font-size: 15px;
+      color: #0B1320;
+    }
+    
+    .setting-label p {
+      margin: 0;
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 26px;
+    }
+    
+    .toggle-switch input {
+      display: none;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.3s;
+      border-radius: 26px;
+    }
+    
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+    
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: #FF7A00;
+    }
+    
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+    
+    /* ============================================
+       RESPONSIVE
+    ============================================ */
+    .mobile-menu-btn {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: #FF7A00;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(255,122,0,0.4);
+      z-index: 99;
+    }
+    
+    @media (max-width: 1024px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       
       .charts-grid {
         grid-template-columns: 1fr;
       }
       
-      .stats-grid {
+      .form-grid {
         grid-template-columns: 1fr;
       }
     }
+    
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      
+      .top-bar-actions {
+        width: 100%;
+        flex-direction: column;
+      }
+      
+      .search-box {
+        width: 100%;
+      }
+      
+      .filter-buttons {
+        flex-direction: column;
+      }
+      
+      .filter-btn {
+        width: 100%;
+      }
+      
+      .content-area {
+        padding: 20px 15px;
+      }
+    }
+    
+    /* ============================================
+       LOADING & EMPTY STATES
+    ============================================ */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+    
+    .empty-state h3 {
+      margin: 0 0 10px 0;
+      color: #666;
+      font-size: 20px;
+    }
+    
+    .empty-state p {
+      margin: 0;
+      color: #999;
+      font-size: 14px;
+    }
+    
+    /* ============================================
+       UTILITY CLASSES
+    ============================================ */
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .mt-20 { margin-top: 20px; }
+    .mb-20 { margin-bottom: 20px; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .gap-10 { gap: 10px; }
   </style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <img src="flashbuy-logo-white.svg" alt="FlashBuy" class="logo" style="width: 200px; height: auto;" />
+  
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <img src="https://pruebaflash.netlify.app/flashbuy-logo-white.svg" alt="FlashBuy" class="sidebar-logo" />
     </div>
-    <nav class="desktop">
-      <a href="index.html">🏠 Tienda</a>
-      <a href="productos.html">📦 Productos</a>
-      <a href="admin-data001.html" style="background: rgba(255,122,0,0.2); color: #FF7A00;">⚙️ Admin</a>
+    
+    <nav class="sidebar-menu">
+      <a href="#" class="menu-item active" onclick="switchSection('dashboard')">
+        <span class="menu-item-icon">📊</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="menu-item" onclick="switchSection('productos')">
+        <span class="menu-item-icon">📦</span>
+        <span>Productos</span>
+      </a>
+      <a href="#" class="menu-item" onclick="switchSection('pedidos')">
+        <span class="menu-item-icon">🛒</span>
+        <span>Pedidos</span>
+      </a>
+      <a href="#" class="menu-item" onclick="switchSection('clientes')">
+        <span class="menu-item-icon">👥</span>
+        <span>Clientes</span>
+      </a>
+      <a href="#" class="menu-item" onclick="switchSection('ventas')">
+        <span class="menu-item-icon">💰</span>
+        <span>Ventas</span>
+      </a>
+      <a href="#" class="menu-item" onclick="switchSection('marketing')">
+        <span class="menu-item-icon">🎯</span>
+        <span>Marketing</span>
+      </a>
+      <a href="#" class="menu-item" onclick="switchSection('envios')">
+        <span class="menu-item-icon">🚚</span>
+        <span>Envíos</span>
+      </a>
+      <a href="#" class="menu-item" onclick="switchSection('configuracion')">
+        <span class="menu-item-icon">⚙️</span>
+        <span>Configuración</span>
+      </a>
     </nav>
-  </header>
 
-  <div class="admin-container">
-    <div class="admin-header">
-      <h1>🚀 FlashBuy Analytics Dashboard</h1>
-      <p>Panel de control y análisis empresarial completo</p>
-    </div>
-
-    <!-- Tabs Navigation -->
-    <div class="tabs-container">
-      <div class="tabs-nav">
-        <button class="tab-btn active" onclick="switchTab('dashboard')">
-          📊 Dashboard Analytics
-        </button>
-        <button class="tab-btn" onclick="switchTab('productos')">
-          📦 Gestión de Productos
-        </button>
-        <button class="tab-btn" onclick="switchTab('agregar')">
-          ➕ Agregar Producto
-        </button>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">A</div>
+        <div class="user-details">
+          <div class="user-name">Admin FlashBuy</div>
+          <div class="user-role">Administrador</div>
+        </div>
       </div>
     </div>
+  </aside>
 
-    <!-- TAB 1: DASHBOARD ANALYTICS -->
-    <div id="tab-dashboard" class="tab-content active">
-      <!-- Stats Cards -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-card-header">
-            <h3>Visitantes Únicos</h3>
-            <div class="stat-icon">👥</div>
-          </div>
-          <div class="stat-number" id="stat-visitantes">0</div>
-          <div class="stat-change">
-            ↗ <span id="stat-visitantes-change">+12%</span> vs ayer
-          </div>
-        </div>
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
 
-        <div class="stat-card blue">
-          <div class="stat-card-header">
-            <h3>Productos Vendidos</h3>
-            <div class="stat-icon">🛒</div>
-          </div>
-          <div class="stat-number" id="stat-vendidos">0</div>
-          <div class="stat-change">
-            ↗ <span>+8%</span> vs ayer
-          </div>
-        </div>
-
-        <div class="stat-card green">
-          <div class="stat-card-header">
-            <h3>Agregados al Carrito</h3>
-            <div class="stat-icon">➕</div>
-          </div>
-          <div class="stat-number" id="stat-agregados">0</div>
-          <div class="stat-change">
-            ↗ <span>+15%</span> esta semana
-          </div>
-        </div>
-
-        <div class="stat-card red">
-          <div class="stat-card-header">
-            <h3>Removidos del Carrito</h3>
-            <div class="stat-icon">🗑️</div>
-          </div>
-          <div class="stat-number" id="stat-removidos">0</div>
-          <div class="stat-change negative">
-            ↘ <span>-5%</span> vs semana pasada
-          </div>
-        </div>
-
-        <div class="stat-card purple">
-          <div class="stat-card-header">
-            <h3>Ventas Totales</h3>
-            <div class="stat-icon">💰</div>
-          </div>
-          <div class="stat-number" id="stat-ventas-total">R$ 0</div>
-          <div class="stat-change">
-            ↗ <span>+22%</span> este mes
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-card-header">
-            <h3>Productos Activos</h3>
-            <div class="stat-icon">📦</div>
-          </div>
-          <div class="stat-number" id="stat-productos-activos">0</div>
-          <div class="stat-change">
-            ✓ En stock
-          </div>
-        </div>
-
-        <div class="stat-card blue">
-          <div class="stat-card-header">
-            <h3>Tasa de Conversión</h3>
-            <div class="stat-icon">📈</div>
-          </div>
-          <div class="stat-number" id="stat-conversion">0%</div>
-          <div class="stat-change">
-            ↗ <span>+3%</span> vs mes pasado
-          </div>
-        </div>
-
-        <div class="stat-card green">
-          <div class="stat-card-header">
-            <h3>Valor Promedio</h3>
-            <div class="stat-icon">💵</div>
-          </div>
-          <div class="stat-number" id="stat-valor-promedio">R$ 0</div>
-          <div class="stat-change">
-            ↗ <span>+10%</span> este mes
-          </div>
-        </div>
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <h1 id="pageTitle">Dashboard</h1>
+        <p>Resumen general de tu tienda</p>
       </div>
-
-      <!-- Charts Grid -->
-      <div class="charts-grid">
-        <div class="chart-card">
-          <h3>📊 Productos Más Vendidos</h3>
-          <canvas id="chartVendidos"></canvas>
-        </div>
-
-        <div class="chart-card">
-          <h3>🔥 Productos Más Clickeados</h3>
-          <canvas id="chartClickeados"></canvas>
-        </div>
-
-        <div class="chart-card full-width">
-          <h3>📈 Visitas por Hora (Últimas 24h)</h3>
-          <canvas id="chartVisitasHora"></canvas>
-        </div>
-
-        <div class="chart-card">
-          <h3>🌍 Visitantes por País</h3>
-          <canvas id="chartPaises"></canvas>
-        </div>
-
-        <div class="chart-card">
-          <h3>🛒 Carrito: Agregados vs Removidos</h3>
-          <canvas id="chartCarrito"></canvas>
-        </div>
+      <div class="top-bar-actions">
+        <a href="#" class="btn-visit-store">🌐 Ver tienda</a>
       </div>
+    </header>
 
-      <!-- Visitors Table -->
-      <div class="visitors-table-container">
-        <h3 style="margin: 0 0 20px 0;">👥 Visitantes Recientes</h3>
-        <table class="visitors-table">
-          <thead>
-            <tr>
-              <th>IP</th>
-              <th>País</th>
-              <th>Ciudad</th>
-              <th>Fecha y Hora</th>
-              <th>Páginas Vistas</th>
-              <th>Duración</th>
-            </tr>
-          </thead>
-          <tbody id="visitantes-tbody">
-            <!-- Se llena dinámicamente -->
-          </tbody>
-        </table>
-      </div>
+    <div class="content-area">
+
+      <!-- DASHBOARD -->
+      <section id="dashboard" class="section active">
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Visitas</h3>
+            <div class="stat-number">12,480</div>
+            <div class="stat-change">▲ 12%</div>
+          </div>
+          <div class="stat-card green">
+            <h3>Ventas</h3>
+            <div class="stat-number">$8,920</div>
+            <div class="stat-change">▲ 18%</div>
+          </div>
+          <div class="stat-card blue">
+            <h3>Pedidos</h3>
+            <div class="stat-number">312</div>
+            <div class="stat-change">▲ 9%</div>
+          </div>
+          <div class="stat-card red">
+            <h3>Abandonos</h3>
+            <div class="stat-number">21%</div>
+            <div class="stat-change negative">▼ 4%</div>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Ventas semanales</h3>
+            <canvas id="salesChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Tráfico</h3>
+            <canvas id="trafficChart"></canvas>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- PRODUCTOS -->
+      <section id="productos" class="section">
+        <div class="table-container">
+          <div class="table-header">
+            <h3>Productos</h3>
+            <button class="btn btn-primary">➕ Nuevo producto</button>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Auriculares Bluetooth</td>
+                <td>$29.99</td>
+                <td>120</td>
+                <td><span class="badge trending">Trending</span></td>
+                <td>
+                  <button class="btn-edit">Editar</button>
+                  <button class="btn-delete">Eliminar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- PEDIDOS -->
+      <section id="pedidos" class="section">
+        <div class="table-container">
+          <h3>Pedidos recientes</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>#10231</td>
+                <td>Juan Pérez</td>
+                <td>$89.00</td>
+                <td><span class="order-status shipped">Enviado</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- CLIENTES -->
+      <section id="clientes" class="section">
+        <div class="table-container">
+          <h3>Clientes</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Segmento</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Ana Gómez</td>
+                <td>ana@email.com</td>
+                <td><span class="customer-segment vip">VIP</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- MARKETING -->
+      <section id="marketing" class="section">
+        <div class="coupon-card">
+          <div class="coupon-code">FLASH10</div>
+          <p>10% de descuento - válido 30 días</p>
+        </div>
+      </section>
+
+      <!-- ENVIOS -->
+      <section id="envios" class="section">
+        <div class="shipping-zone">
+          <div class="shipping-zone-header">
+            <h4>Zona Nacional</h4>
+            <button class="btn-edit">Editar</button>
+          </div>
+          <div class="shipping-rate">
+            <span>Estándar</span>
+            <span>$5.00</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONFIGURACION -->
+      <section id="configuracion" class="section">
+        <div class="settings-section">
+          <h3>Configuración general</h3>
+          <div class="setting-item">
+            <div class="setting-label">
+              <h4>Mantenimiento</h4>
+              <p>Activar modo mantenimiento</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
     </div>
+  </main>
 
-    <!-- TAB 2: GESTIÓN DE PRODUCTOS -->
-    <div id="tab-productos" class="tab-content">
-      <div class="products-table-container">
-        <h2 style="margin: 0 0 20px 0;">📦 Gestión de Productos</h2>
-        
-        <div class="filter-buttons">
-          <button class="filter-btn active" onclick="filtrarProductos('todos')">
-            📋 Todos
-          </button>
-          <button class="filter-btn" onclick="filtrarProductos('vendidos')">
-            🔥 Más Vendidos
-          </button>
-          <button class="filter-btn" onclick="filtrarProductos('clickeados')">
-            👆 Más Clickeados
-          </button>
-          <button class="filter-btn" onclick="filtrarProductos('stock-bajo')">
-            ⚠️ Stock Bajo
-          </button>
-          <button class="filter-btn" onclick="filtrarProductos('sin-stock')">
-            ❌ Sin Stock
-          </button>
-        </div>
+  <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
 
-        <table class="products-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Producto</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th>Clicks</th>
-              <th>Ventas</th>
-              <th>Agregados</th>
-              <th>Removidos</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="productos-tbody">
-            <!-- Se llena dinámicamente -->
-          </tbody>
-        </table>
-      </div>
-    </div>
+  <script>
+    function switchSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
 
-    <!-- TAB 3: AGREGAR/EDITAR PRODUCTO -->
-    <div id="tab-agregar" class="tab-content">
-      <div class="form-section">
-        <h2 id="form-title">➕ Agregar Nuevo Producto</h2>
-        <form id="productoForm">
-          <input type="hidden" id="editing_id" value="">
-          
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Nombre del Producto *</label>
-              <input type="text" id="producto_nombre" required placeholder="Ej: Mouse Gamer RGB Pro">
-            </div>
+      document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+      event.currentTarget.classList.add('active');
 
-            <div class="form-group">
-              <label>Precio (R$) *</label>
-              <input type="number" id="producto_precio" step="0.01" required placeholder="79.90">
-            </div>
+      document.getElementById('pageTitle').innerText =
+        id.charAt(0).toUpperCase() + id.slice(1);
+    }
 
-            <div class="form-group">
-              <label>Categoría *</label>
-              <select id="producto_categoria" required>
-                <option value="">Seleccionar...</option>
-                <option value="Tecnologia">Tecnología</option>
-                <option value="Ropa">Ropa</option>
-                <option value="Accesorios">Accesorios</option>
-                <option value="Utensilios">Utensilios</option>
-              </select>
-            </div>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
 
-            <div class="form-group">
-              <label>Stock Disponible *</label>
-              <input type="number" id="producto_stock" required placeholder="50">
-            </div>
+    new Chart(document.getElementById('salesChart'), {
+      type: 'line',
+      data: {
+        labels: ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],
+        datasets: [{
+          label: 'Ventas',
+          data: [120,190,300,250,220,310,400],
+          borderWidth: 2,
+          fill: false
+        }]
+      }
+    });
 
-            <div class="form-group full-width">
-              <label>Descripción del Producto</label>
-              <textarea id="producto_descripcion" rows="3" placeholder="Descripción detallada..."></textarea>
-            </div>
+    new Chart(document.getElementById('trafficChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],
+        datasets: [{
+          label: 'Visitas',
+          data: [800,950,1100,980,1200,1500,1800]
+        }]
+      }
+    });
+  </script>
 
-            <div class="form-group full-width">
-              <label>URL de la Imagen Principal *</label>
-              <input type="url" id="producto_imagen" required placeholder="https://images.unsplash.com/photo-...">
-            </div>
-          </div>
-
-          <div style="margin-top: 30px;">
-            <button type="submit" class="btn-primary" id="btn-submit">💾 Guardar Producto</button>
-            <button type="button" class="btn-secondary" onclick="cancelarEdicion()">❌ Cancelar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <script src="js/productos.js"></script>
-  <script src="js/admin-analytics.js"></script>
 </body>
 </html>

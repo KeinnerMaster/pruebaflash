@@ -1,8 +1,4 @@
-// tracking.js - Sistema de tracking de visitantes y comportamiento
-
-// ============================================
-// TRACKING DE VISITANTES
-// ============================================
+// tracking.js - Sistema de tracking con Umami Analytics integrado
 
 (function() {
   'use strict';
@@ -18,41 +14,85 @@
   if (!analyticsData.ventasPorHora) analyticsData.ventasPorHora = Array(24).fill(0);
   
   // ============================================
+  // VERIFICAR SI UMAMI ESTÁ CARGADO
+  // ============================================
+  
+  function isUmamiLoaded() {
+    return typeof umami !== 'undefined' && typeof umami.track === 'function';
+  }
+  
+  function waitForUmami(callback, maxAttempts = 20) {
+    let attempts = 0;
+    const checkUmami = setInterval(() => {
+      attempts++;
+      if (isUmamiLoaded()) {
+        clearInterval(checkUmami);
+        callback();
+      } else if (attempts >= maxAttempts) {
+        clearInterval(checkUmami);
+        console.log('⚠️ Umami no se cargó, usando tracking interno');
+        callback(); // Continuar sin Umami
+      }
+    }, 100);
+  }
+  
+  // ============================================
+  // DETECTAR SI ES BOT (Filtro Local Adicional)
+  // ============================================
+  
+  function isBot() {
+    const botPatterns = [
+      /bot/i, /spider/i, /crawl/i, /slurp/i, /lighthouse/i,
+      /headless/i, /phantom/i, /selenium/i, /webdriver/i
+    ];
+    
+    const userAgent = navigator.userAgent || '';
+    return botPatterns.some(pattern => pattern.test(userAgent));
+  }
+  
+  // ============================================
   // DETECTAR INFORMACIÓN DEL VISITANTE
   // ============================================
   
   async function obtenerInfoVisitante() {
     try {
-      // Intentar obtener ubicación por IP usando API gratuita
       const response = await fetch('https://ipapi.co/json/');
       const data = await response.json();
       
       return {
-        ip: data.ip || generarIPSimulada(),
+        ip: data.ip || generarIPLocal(),
         pais: data.country_name || 'Desconocido',
         bandera: obtenerBandera(data.country_code || 'XX'),
         ciudad: data.city || 'Desconocida',
         fecha: new Date().toISOString(),
         paginasVistas: 1,
-        duracion: '< 1min'
+        isBot: isBot()
       };
     } catch (error) {
-      // Si falla la API, usar datos simulados
-      console.log('Error al obtener ubicación, usando datos simulados');
+      console.log('Usando datos locales para visitante');
       return {
-        ip: generarIPSimulada(),
+        ip: generarIPLocal(),
         pais: 'Brasil',
         bandera: '🇧🇷',
         ciudad: 'São Paulo',
         fecha: new Date().toISOString(),
         paginasVistas: 1,
-        duracion: '< 1min'
+        isBot: isBot()
       };
     }
   }
   
-  function generarIPSimulada() {
-    return `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+  function generarIPLocal() {
+    const navegador = navigator.userAgent;
+    const idioma = navigator.language;
+    const pantalla = `${screen.width}x${screen.height}`;
+    const fingerprint = btoa(`${navegador}${idioma}${pantalla}`).substring(0, 10);
+    
+    const segments = fingerprint.match(/.{1,2}/g) || [];
+    return segments.slice(0, 4).map(seg => {
+      const num = parseInt(seg, 36) % 256;
+      return num;
+    }).join('.');
   }
   
   function obtenerBandera(countryCode) {
@@ -66,143 +106,236 @@
   }
   
   // ============================================
-  // REGISTRAR VISITA
+  // REGISTRAR VISITA (CON UMAMI)
   // ============================================
   
   async function registrarVisita() {
     // Verificar si ya se registró en esta sesión
     const sessionKey = 'flashbuy_session_' + new Date().toDateString();
     if (sessionStorage.getItem(sessionKey)) {
-      return; // Ya se registró hoy
+      console.log('✓ Visitante ya registrado hoy');
+      return;
     }
     
+    // Verificar si es bot
+    if (isBot()) {
+      console.log('🤖 Bot detectado, no se registra');
+      return;
+    }
+    
+    console.log('🔍 Registrando nuevo visitante...');
     const infoVisitante = await obtenerInfoVisitante();
     
-    // Agregar a analytics
+    // Si es bot, no registrar
+    if (infoVisitante.isBot) {
+      console.log('🤖 Bot detectado por user agent');
+      return;
+    }
+    
+    // Agregar a analytics local
     analyticsData.visitantes.push(infoVisitante);
     
     // Registrar hora de visita
     const hora = new Date().getHours();
     analyticsData.ventasPorHora[hora]++;
     
-    // Guardar
+    // Guardar local
     localStorage.setItem('flashbuy_analytics', JSON.stringify(analyticsData));
     sessionStorage.setItem(sessionKey, 'true');
+    
+    // Enviar a Umami (si está disponible)
+    if (isUmamiLoaded()) {
+      umami.track('page_view', {
+        ip: infoVisitante.ip,
+        country: infoVisitante.pais,
+        city: infoVisitante.ciudad
+      });
+      console.log('✅ Visita registrada en Umami');
+    }
     
     console.log('✅ Visita registrada:', infoVisitante);
   }
   
   // ============================================
-  // TRACKING DE CLICKS EN PRODUCTOS
+  // TRACKING DE CLICKS EN PRODUCTOS (CON UMAMI)
   // ============================================
   
   function trackProductClick(productId) {
+    if (isBot()) return;
+    
     if (!analyticsData.productosClickeados[productId]) {
       analyticsData.productosClickeados[productId] = 0;
     }
     analyticsData.productosClickeados[productId]++;
     localStorage.setItem('flashbuy_analytics', JSON.stringify(analyticsData));
+    
+    // Enviar a Umami
+    if (isUmamiLoaded()) {
+      umami.track('product_click', { product_id: productId });
+    }
+    
     console.log(`📊 Click registrado en producto ${productId}`);
   }
   
   // ============================================
-  // TRACKING DE CARRITO
+  // TRACKING DE CARRITO (CON UMAMI)
   // ============================================
   
   function trackCarritoAgregado(productId) {
+    if (isBot()) return;
+    
     if (!analyticsData.carritoAgregados[productId]) {
       analyticsData.carritoAgregados[productId] = 0;
     }
     analyticsData.carritoAgregados[productId]++;
     localStorage.setItem('flashbuy_analytics', JSON.stringify(analyticsData));
+    
+    // Enviar a Umami
+    if (isUmamiLoaded()) {
+      umami.track('add_to_cart', { product_id: productId });
+    }
+    
     console.log(`🛒 Producto ${productId} agregado al carrito`);
   }
   
   function trackCarritoRemovido(productId) {
+    if (isBot()) return;
+    
     if (!analyticsData.carritoRemovidos[productId]) {
       analyticsData.carritoRemovidos[productId] = 0;
     }
     analyticsData.carritoRemovidos[productId]++;
     localStorage.setItem('flashbuy_analytics', JSON.stringify(analyticsData));
+    
+    // Enviar a Umami
+    if (isUmamiLoaded()) {
+      umami.track('remove_from_cart', { product_id: productId });
+    }
+    
     console.log(`🗑️ Producto ${productId} removido del carrito`);
   }
   
   // ============================================
-  // TRACKING DE VENTAS
+  // TRACKING DE VENTAS (CON UMAMI)
   // ============================================
   
   function trackVenta(productId, cantidad) {
+    if (isBot()) return;
+    
     analyticsData.productosVendidos.push({
       productoId: productId,
       cantidad: cantidad,
       fecha: new Date().toISOString()
     });
     localStorage.setItem('flashbuy_analytics', JSON.stringify(analyticsData));
+    
+    // Enviar a Umami
+    if (isUmamiLoaded()) {
+      umami.track('purchase', { 
+        product_id: productId,
+        quantity: cantidad
+      });
+    }
+    
     console.log(`💰 Venta registrada: Producto ${productId}, Cantidad ${cantidad}`);
+  }
+  
+  // ============================================
+  // TRACKING DE BÚSQUEDAS (NUEVO)
+  // ============================================
+  
+  function trackBusqueda(termino) {
+    if (isBot()) return;
+    
+    if (isUmamiLoaded()) {
+      umami.track('search', { term: termino });
+    }
+    
+    console.log(`🔍 Búsqueda: ${termino}`);
   }
   
   // ============================================
   // INTEGRAR CON FUNCIONES EXISTENTES
   // ============================================
   
-  // Sobrescribir función agregar del productos.js
   window.addEventListener('load', function() {
-    // Registrar visita al cargar la página
-    registrarVisita();
-    
-    // Interceptar clicks en productos (si estamos en detalle-producto.html)
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id');
-    if (productId && window.location.pathname.includes('detalle-producto')) {
-      trackProductClick(parseInt(productId));
-    }
-    
-    // Monitorear clicks en la galería de productos
-    document.addEventListener('click', function(e) {
-      const productoCard = e.target.closest('.producto');
-      if (productoCard) {
-        // Intentar extraer ID del producto desde el onclick del botón
-        const button = productoCard.querySelector('button[onclick]');
-        if (button) {
-          const match = button.getAttribute('onclick').match(/agregar\((\d+)\)/);
-          if (match) {
-            const prodId = parseInt(match[1]);
-            trackProductClick(prodId);
-          }
-        }
+    // Esperar a que Umami se cargue
+    waitForUmami(() => {
+      // Registrar visita al cargar cualquier página
+      registrarVisita();
+      
+      // Si estamos en detalle de producto, registrar click
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('id');
+      if (productId && window.location.pathname.includes('detalle-producto')) {
+        trackProductClick(parseInt(productId));
       }
+      
+      // Monitorear clicks en tarjetas de productos
+      setTimeout(() => {
+        const productCards = document.querySelectorAll('.producto');
+        productCards.forEach(card => {
+          card.addEventListener('click', function(e) {
+            const button = this.querySelector('button[onclick*="agregar"]');
+            if (button) {
+              const match = button.getAttribute('onclick').match(/agregar\((\d+)\)/);
+              if (match) {
+                const prodId = parseInt(match[1]);
+                trackProductClick(prodId);
+              }
+            }
+          });
+        });
+      }, 1000);
     });
   });
   
-  // Sobrescribir función agregar original
-  const originalAgregar = window.agregar;
-  if (originalAgregar) {
-    window.agregar = function(id) {
-      trackCarritoAgregado(id);
-      return originalAgregar(id);
-    };
-  }
+  // ============================================
+  // SOBRESCRIBIR FUNCIONES EXISTENTES
+  // ============================================
   
-  // Monitorear función removeItem del carrito
-  const originalRemoveItem = window.removeItem;
-  if (originalRemoveItem) {
-    window.removeItem = function(index) {
-      const carrito = JSON.parse(localStorage.getItem('flashbuy_cart') || '[]');
-      if (carrito[index]) {
-        trackCarritoRemovido(carrito[index].id);
-      }
-      return originalRemoveItem(index);
-    };
-  }
+  const agregarInterval = setInterval(() => {
+    if (window.agregar) {
+      const originalAgregar = window.agregar;
+      window.agregar = function(id) {
+        trackCarritoAgregado(id);
+        return originalAgregar(id);
+      };
+      clearInterval(agregarInterval);
+      console.log('✅ Tracking de carrito activado (agregar)');
+    }
+  }, 100);
   
-  // Exponer funciones globalmente para uso manual
+  const removeInterval = setInterval(() => {
+    if (window.removeItem) {
+      const originalRemoveItem = window.removeItem;
+      window.removeItem = function(index) {
+        const carrito = JSON.parse(localStorage.getItem('flashbuy_cart') || '[]');
+        if (carrito[index]) {
+          trackCarritoRemovido(carrito[index].id);
+        }
+        return originalRemoveItem(index);
+      };
+      clearInterval(removeInterval);
+      console.log('✅ Tracking de carrito activado (remover)');
+    }
+  }, 100);
+  
+  // ============================================
+  // API PÚBLICA
+  // ============================================
+  
   window.flashbuyTracking = {
     trackProductClick: trackProductClick,
     trackCarritoAgregado: trackCarritoAgregado,
     trackCarritoRemovido: trackCarritoRemovido,
     trackVenta: trackVenta,
-    registrarVisita: registrarVisita
+    trackBusqueda: trackBusqueda,
+    registrarVisita: registrarVisita,
+    isUmamiLoaded: isUmamiLoaded
   };
+  
+  console.log('🚀 FlashBuy Tracking System con Umami cargado');
   
 })();
 
@@ -211,18 +344,21 @@
 // ============================================
 
 /*
+EVENTOS AUTOMÁTICOS TRACKEADOS EN UMAMI:
+
+✅ page_view - Vista de página (sin bots)
+✅ product_click - Click en producto
+✅ add_to_cart - Agregar al carrito
+✅ remove_from_cart - Remover del carrito
+✅ purchase - Compra completada (manual)
+✅ search - Búsqueda (si implementas buscador)
+
 PARA TRACKEAR VENTAS MANUALMENTE:
-
-Cuando se complete una venta (después de confirmar en WhatsApp o en tu proceso de pago):
-
 window.flashbuyTracking.trackVenta(productoId, cantidad);
 
-Ejemplo:
-window.flashbuyTracking.trackVenta(2, 3); // Producto ID 2, cantidad 3
+PARA TRACKEAR BÚSQUEDAS:
+window.flashbuyTracking.trackBusqueda('termino de busqueda');
 
-PARA TRACKEAR EVENTOS PERSONALIZADOS:
-
-window.flashbuyTracking.trackProductClick(productoId);
-window.flashbuyTracking.trackCarritoAgregado(productoId);
-window.flashbuyTracking.trackCarritoRemovido(productoId);
+VERIFICAR SI UMAMI ESTÁ FUNCIONANDO:
+window.flashbuyTracking.isUmamiLoaded() // true o false
 */
