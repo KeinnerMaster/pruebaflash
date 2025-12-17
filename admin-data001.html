@@ -536,42 +536,57 @@
     // CARGAR DATOS
     // ============================================
     function cargarDatos() {
-      // Cargar productos desde localStorage
-      const savedProducts = localStorage.getItem('flashbuy_productos');
-      if (savedProducts) {
-        productos = JSON.parse(savedProducts);
-      }
+  // Cargar productos desde localStorage
+  const savedProducts = localStorage.getItem('flashbuy_productos');
+  if (savedProducts) {
+    productos = JSON.parse(savedProducts);
+  } else {
+    // Si no hay productos, cargar los predeterminados
+    productos = [
+      { id: 1, nombre: "Cargador inalámbrico FastCharge", precio: 49.90, imagen: "https://images.unsplash.com/photo-1591290619762-c588dc522ff5?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1591290619762-c588dc522ff5?w=600&h=400&fit=crop"], categoria: "Tecnologia", stock: 120, descripcion: "Cargador inalámbrico de última generación" },
+      { id: 2, nombre: "Audífonos In-Ear Pro", precio: 89.90, imagen: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=400&fit=crop"], categoria: "Tecnologia", stock: 60, descripcion: "Audífonos premium con cancelación activa de ruido" },
+      { id: 3, nombre: "Camiseta Casual", precio: 39.90, imagen: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=400&fit=crop"], categoria: "Ropa", stock: 80, descripcion: "Camiseta de algodón 100%" },
+      { id: 4, nombre: "Mochila Urbana", precio: 59.90, imagen: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=400&fit=crop"], categoria: "Accesorios", stock: 40, descripcion: "Mochila con compartimento para laptop" },
+      { id: 5, nombre: "Organizador de Cocina 3 en 1", precio: 29.90, imagen: "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1556911220-bff31c812dba?w=600&h=400&fit=crop"], categoria: "Utensilios", stock: 100, descripcion: "Set organizador versátil" },
+      { id: 6, nombre: "Lámpara LED Ambiente", precio: 34.90, imagen: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=600&h=400&fit=crop"], categoria: "Tecnologia", stock: 70, descripcion: "Lámpara LED con múltiples colores" },
+      { id: 7, nombre: "Mouse Gamer RGB", precio: 79.90, imagen: "https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&h=400&fit=crop"], categoria: "Tecnologia", stock: 45, descripcion: "Mouse gaming de alta precisión" },
+      { id: 8, nombre: "Teclado Mecánico", precio: 129.90, imagen: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&h=400&fit=crop"], categoria: "Tecnologia", stock: 35, descripcion: "Teclado mecánico profesional" },
+      { id: 9, nombre: "Sudadera con Capucha", precio: 69.90, imagen: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=400&fit=crop"], categoria: "Ropa", stock: 55, descripcion: "Sudadera premium con capucha" },
+      { id: 10, nombre: "Jeans Slim Fit", precio: 89.90, imagen: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&h=400&fit=crop"], categoria: "Ropa", stock: 65, descripcion: "Jeans de mezclilla premium" }
+    ];
+    localStorage.setItem('flashbuy_productos', JSON.stringify(productos));
+  }
 
-      // Cargar pedidos
-      const savedOrders = localStorage.getItem('flashbuy_pedidos');
-      if (savedOrders) {
-        pedidos = JSON.parse(savedOrders);
-      }
+  // Cargar pedidos
+  const savedOrders = localStorage.getItem('flashbuy_pedidos');
+  if (savedOrders) {
+    pedidos = JSON.parse(savedOrders);
+  }
 
-      // Cargar clientes
-      const savedClientes = localStorage.getItem('flashbuy_clientes');
-      if (savedClientes) {
-        clientes = JSON.parse(savedClientes);
-      }
+  // Cargar clientes
+  const savedClientes = localStorage.getItem('flashbuy_clientes');
+  if (savedClientes) {
+    clientes = JSON.parse(savedClientes);
+  }
 
-      // Cargar cupones
-      const savedCupones = localStorage.getItem('flashbuy_cupones');
-      if (savedCupones) {
-        cupones = JSON.parse(savedCupones);
-      }
+  // Cargar cupones
+  const savedCupones = localStorage.getItem('flashbuy_cupones');
+  if (savedCupones) {
+    cupones = JSON.parse(savedCupones);
+  }
 
-      // Cargar zonas de envío
-      const savedZonas = localStorage.getItem('flashbuy_zonas_envio');
-      if (savedZonas) {
-        zonasEnvio = JSON.parse(savedZonas);
-      } else {
-        // Zonas de envío por defecto
-        zonasEnvio = [
-          { id: 1, nombre: 'Nacional', tarifa: 15.00, descripcion: 'Envío a todo el país' },
-          { id: 2, nombre: 'Local', tarifa: 5.00, descripcion: 'Zona metropolitana' }
-        ];
-        localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
-      }
+  // Cargar zonas de envío
+  const savedZonas = localStorage.getItem('flashbuy_zonas_envio');
+  if (savedZonas) {
+    zonasEnvio = JSON.parse(savedZonas);
+  } else {
+    zonasEnvio = [
+      { id: 1, nombre: 'Nacional', tarifa: 15.00, descripcion: 'Envío a todo el país' },
+      { id: 2, nombre: 'Local', tarifa: 5.00, descripcion: 'Zona metropolitana' }
+    ];
+    localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
+  }
+}
     }
 
     // ============================================
