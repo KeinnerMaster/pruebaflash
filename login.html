@@ -57,5 +57,16 @@
   <script src="js/productos.js"></script>
   <script src="js/nav.js"></script>
   <script src="js/carrito.js"></script>
+  <!-- Script de modo mantenimiento -->
+  <script>
+    // Verificar si el modo mantenimiento está activo
+    document.addEventListener('DOMContentLoaded', function() {
+      const mantenimientoActivo = localStorage.getItem('flashbuy_mantenimiento') === 'true';
+      
+      if (mantenimientoActivo) {
+        document.getElementById('maintenancePage').classList.add('active');
+        document.getElementById('mainContent').style.display = 'none';
+      }
+    });
 </body>
 </html>
