@@ -11,8 +11,69 @@
   <meta name="theme-color" content="#FF7A00">
   <!-- Umami Analytics -->
   <script defer src="https://cloud.umami.is/script.js" data-website-id="f974dcbb-29aa-4518-89ec-ab9e4abce31d" data-domains="pruebaflash.netlify.app"></script>
+<style>
+    .maintenance-page {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(135deg, #0B1320 0%, #1a2942 100%);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .maintenance-page.active {
+      display: flex;
+    }
+
+    .maintenance-icon {
+      font-size: 120px;
+      margin-bottom: 30px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .maintenance-page h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+      color: #FF7A00;
+    }
+
+    .maintenance-page p {
+      font-size: 20px;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+
+    .maintenance-page .back-soon {
+      font-size: 16px;
+      opacity: 0.7;
+    }
+</style>
 </head>
 <body>
+
+<!-- PÁGINA DE MANTENIMIENTO -->
+  <div class="maintenance-page" id="maintenancePage">
+    <div class="maintenance-icon">🛠️</div>
+    <h1>Estamos en Mantenimiento</h1>
+    <p>Estamos mejorando nuestra tienda para ofrecerte una mejor experiencia.</p>
+    <p class="back-soon">Volveremos pronto. ¡Gracias por tu paciencia!</p>
+  </div>
+
+<div id="mainContent"></div>
+
   <!-- Barra de anuncio animada -->
   <div class="announcement-bar">
     <div class="announcement-content" style="--text: 'VISITA NUESTRO SHOWROOM EN MEDELLÍN COLOMBIA CALLE 51A#78B-34 LOS COLORES • ENVÍOS A TODA COLOMBIA • PAGO CONTRA ENTREGA DISPONIBLE • GARANTÍA EN TODOS LOS PRODUCTOS •';">
@@ -163,20 +224,23 @@
     © 2025 FlashBuy – Entrega rápida • Pago seguro • Satisfacción garantizada
   </footer>
 
+  </div>
+
   <script src="js/productos.js"></script>
   <script src="js/detalle-producto.js"></script>
   <script src="js/nav.js"></script>
   <script src="js/tracking.js"></script>
-  <!-- Script de modo mantenimiento -->
+  
+  <!-- SCRIPT GLOBAL DE MANTENIMIENTO -->
   <script>
-    // Verificar si el modo mantenimiento está activo
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       const mantenimientoActivo = localStorage.getItem('flashbuy_mantenimiento') === 'true';
-      
+
       if (mantenimientoActivo) {
         document.getElementById('maintenancePage').classList.add('active');
         document.getElementById('mainContent').style.display = 'none';
       }
     });
+  </script>
 </body>
 </html>
