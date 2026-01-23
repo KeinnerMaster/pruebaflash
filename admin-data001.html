@@ -435,4 +435,732 @@
                 </div>
               </div>
               <div style="margin-top:20px;">
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary">💾 Guardar Cupón</button>
+                <button type="button" class="btn btn-secondary" onclick="ocultarFormCupon()">❌ Cancelar</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="cupones-list"></div>
+        </div>
+      </section>
+
+      <!-- ENVIOS -->
+      <section id="envios" class="section">
+        <div class="table-container">
+          <div class="table-header">
+            <h3>🚚 Configuración de Envíos</h3>
+            <button class="btn btn-primary" onclick="agregarZonaEnvio()">➕ Agregar Zona</button>
+          </div>
+          <div id="zonas-envio-list"></div>
+        </div>
+      </section>
+
+      <!-- CONFIGURACION -->
+      <section id="configuracion" class="section">
+        <div class="settings-section">
+          <h3>⚙️ Configuración General</h3>
+          <div class="setting-item">
+            <div class="setting-label">
+              <h4>Modo Mantenimiento</h4>
+              <p>Activar página de mantenimiento en la tienda</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-mantenimiento" onchange="toggleMantenimiento()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div class="setting-label">
+              <h4>Notificaciones por Email</h4>
+              <p>Recibir emails de nuevos pedidos</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <div class="setting-label">
+              <h4>Registro de Clientes</h4>
+              <p>Permitir que nuevos usuarios se registren</p>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h3>🔐 Seguridad</h3>
+          <button class="btn btn-secondary" onclick="limpiarDatos()">🗑️ Limpiar Todos los Datos</button>
+          <button class="btn btn-primary" onclick="exportarDatos()" style="margin-left:10px;">📥 Exportar Datos</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+
+  <script>
+    // ============================================
+    // VARIABLES GLOBALES
+    // ============================================
+    let productos = [];
+    let pedidos = [];
+    let clientes = [];
+    let cupones = [];
+    let zonasEnvio = [];
+    let currentFilter = 'todos';
+    let editingId = null;
+    let charts = {};
+
+    // ============================================
+    // INICIALIZACIÓN
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+      cargarDatos();
+      actualizarDashboard();
+      renderizarProductos();
+      renderizarPedidos();
+      renderizarClientes();
+      renderizarCupones();
+      renderizarZonasEnvio();
+      cargarConfiguracion();
+      
+      // Configurar event listeners para el menú
+      document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+          const section = this.getAttribute('data-section');
+          switchSection(section);
+        });
+      });
+    });
+
+    // ============================================
+    // CARGAR DATOS
+    // ============================================
+    function cargarDatos() {
+      // Cargar productos desde localStorage
+      const savedProducts = localStorage.getItem('flashbuy_productos');
+      if (savedProducts) {
+        productos = JSON.parse(savedProducts);
+      } else {
+        // Si no hay productos, cargar los predeterminados
+        productos = [
+          { id: 1, nombre: "Cargador inalámbrico FastCharge", precio: 49.90, imagen: "https://images.unsplash.com/photo-1591290619762-c588dc522ff5?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1591290619762-c588dc522ff5?w=600&h=400&fit=crop"], categoria: "Tecnologia", stock: 120, descripcion: "Cargador inalámbrico de última generación" },
+          { id: 2, nombre: "Audífonos In-Ear Pro", precio: 89.90, imagen: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=400&fit=crop"], categoria: "Tecnologia", stock: 60, descripcion: "Audífonos premium con cancelación activa de ruido" },
+          { id: 3, nombre: "Camiseta Casual", precio: 39.90, imagen: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=400&fit=crop"], categoria: "Ropa", stock: 80, descripcion: "Camiseta de algodón 100%" },
+          { id: 4, nombre: "Mochila Urbana", precio: 59.90, imagen: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=400&fit=crop"], categoria: "Accesorios", stock: 40, descripcion: "Mochila con compartimento para laptop" },
+          { id: 5, nombre: "Organizador de Cocina 3 en 1", precio: 29.90, imagen: "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1556911220-bff31c812dba?w=600&h=400&fit=crop"], categoria: "Utensilios", stock: 100, descripcion: "Set organizador versátil" },
+          { id: 6, nombre: "Lámpara LED Ambiente", precio: 34.90, imagen: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=600&h=400&fit=crop"], categoria: "Tecnologia", stock: 70, descripcion: "Lámpara LED con múltiples colores" },
+          { id: 7, nombre: "Mouse Gamer RGB", precio: 79.90, imagen: "https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&h=400&fit=crop"], categoria: "Tecnologia", stock: 45, descripcion: "Mouse gaming de alta precisión" },
+          { id: 8, nombre: "Teclado Mecánico", precio: 129.90, imagen: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&h=400&fit=crop"], categoria: "Tecnologia", stock: 35, descripcion: "Teclado mecánico profesional" },
+          { id: 9, nombre: "Sudadera con Capucha", precio: 69.90, imagen: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=400&fit=crop"], categoria: "Ropa", stock: 55, descripcion: "Sudadera premium con capucha" },
+          { id: 10, nombre: "Jeans Slim Fit", precio: 89.90, imagen: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&h=400&fit=crop", imagenes: ["https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&h=400&fit=crop"], categoria: "Ropa", stock: 65, descripcion: "Jeans de mezclilla premium" }
+        ];
+        localStorage.setItem('flashbuy_productos', JSON.stringify(productos));
+      }
+
+      // Cargar pedidos
+      const savedOrders = localStorage.getItem('flashbuy_pedidos');
+      if (savedOrders) {
+        pedidos = JSON.parse(savedOrders);
+      }
+
+      // Cargar clientes
+      const savedClientes = localStorage.getItem('flashbuy_clientes');
+      if (savedClientes) {
+        clientes = JSON.parse(savedClientes);
+      }
+
+      // Cargar cupones
+      const savedCupones = localStorage.getItem('flashbuy_cupones');
+      if (savedCupones) {
+        cupones = JSON.parse(savedCupones);
+      }
+
+      // Cargar zonas de envío
+      const savedZonas = localStorage.getItem('flashbuy_zonas_envio');
+      if (savedZonas) {
+        zonasEnvio = JSON.parse(savedZonas);
+      } else {
+        zonasEnvio = [
+          { id: 1, nombre: 'Nacional', tarifa: 15.00, descripcion: 'Envío a todo el país' },
+          { id: 2, nombre: 'Local', tarifa: 5.00, descripcion: 'Zona metropolitana' }
+        ];
+        localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
+      }
+    }
+
+    // ============================================
+    // NAVEGACIÓN
+    // ============================================
+    function switchSection(sectionName) {
+      // Ocultar todas las secciones
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      
+      // Mostrar sección seleccionada
+      document.getElementById(sectionName).classList.add('active');
+      
+      // Actualizar menú
+      document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+      
+      // Encontrar y activar el elemento del menú clickeado
+      const menuItems = document.querySelectorAll('.menu-item');
+      menuItems.forEach(item => {
+        if (item.getAttribute('data-section') === sectionName) {
+          item.classList.add('active');
+        }
+      });
+      
+      // Actualizar título
+      const titles = {
+        'dashboard': ['📊 Dashboard', 'Resumen general de tu tienda'],
+        'productos': ['📦 Productos', 'Gestión de productos del catálogo'],
+        'agregar-producto': ['➕ Agregar Producto', 'Crear o editar producto'],
+        'pedidos': ['🛒 Pedidos', 'Gestión de pedidos y ventas'],
+        'clientes': ['👥 Clientes', 'Base de datos de clientes'],
+        'marketing': ['🎯 Marketing', 'Cupones y promociones'],
+        'envios': ['🚚 Envíos', 'Configuración de tarifas de envío'],
+        'configuracion': ['⚙️ Configuración', 'Ajustes generales del sistema']
+      };
+      
+      document.getElementById('pageTitle').textContent = titles[sectionName][0];
+      document.getElementById('pageSubtitle').textContent = titles[sectionName][1];
+      
+      // Cerrar sidebar en móvil
+      if (window.innerWidth <= 1024) {
+        document.getElementById('sidebar').classList.remove('open');
+      }
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    function goToAddProduct() {
+      switchSection('agregar-producto');
+    }
+
+    // ============================================
+    // FORMATO
+    // ============================================
+    function formatBRL(n) {
+      return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    // ============================================
+    // DASHBOARD
+    // ============================================
+    function actualizarDashboard() {
+      const totalProductos = productos.length;
+      const enStock = productos.filter(p => p.stock > 0).length;
+      const stockBajo = productos.filter(p => p.stock > 0 && p.stock < 20).length;
+      const valorInventario = productos.reduce((sum, p) => sum + (p.precio * p.stock), 0);
+      
+      document.getElementById('stat-total-productos').textContent = totalProductos;
+      document.getElementById('stat-en-stock').textContent = enStock;
+      document.getElementById('stat-stock-bajo').textContent = stockBajo;
+      document.getElementById('stat-valor-inventario').textContent = formatBRL(valorInventario);
+      
+      // Gráfico de categorías
+      const categorias = {};
+      productos.forEach(p => {
+        categorias[p.categoria] = (categorias[p.categoria] || 0) + 1;
+      });
+      
+      if (charts.categorias) charts.categorias.destroy();
+      charts.categorias = new Chart(document.getElementById('chartCategorias'), {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(categorias),
+          datasets: [{
+            data: Object.values(categorias),
+            backgroundColor: ['#FF7A00', '#2196F3', '#4CAF50', '#9C27B0']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: true }
+      });
+      
+      // Gráfico de stock
+      const conStock = productos.filter(p => p.stock >= 20).length;
+      const stockCritico = productos.filter(p => p.stock > 0 && p.stock < 20).length;
+      const sinStock = productos.filter(p => p.stock === 0).length;
+      
+      if (charts.stock) charts.stock.destroy();
+      charts.stock = new Chart(document.getElementById('chartStock'), {
+        type: 'bar',
+        data: {
+          labels: ['Con Stock', 'Stock Bajo', 'Sin Stock'],
+          datasets: [{
+            label: 'Productos',
+            data: [conStock, stockCritico, sinStock],
+            backgroundColor: ['#4CAF50', '#FF9800', '#F44336']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true } } }
+      });
+      
+      // Tabla de stock crítico
+      const criticos = productos.filter(p => p.stock > 0 && p.stock < 20).slice(0, 5);
+      const tbody = document.getElementById('critical-stock-tbody');
+      tbody.innerHTML = '';
+      
+      if (criticos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">✅ No hay productos con stock crítico</td></tr>';
+      } else {
+        criticos.forEach(p => {
+          tbody.innerHTML += `
+            <tr>
+              <td><strong>${p.nombre}</strong></td>
+              <td>${p.categoria}</td>
+              <td><span style="color:#ef6c00;font-weight:bold;">${p.stock} unidades</span></td>
+              <td>${formatBRL(p.precio)}</td>
+            </tr>
+          `;
+        });
+      }
+    }
+
+    // ============================================
+    // PRODUCTOS
+    // ============================================
+    function renderizarProductos() {
+      const tbody = document.getElementById('productos-tbody');
+      tbody.innerHTML = '';
+      
+      let productosFiltrados = [...productos];
+      
+      // Aplicar filtro
+      if (currentFilter !== 'todos') {
+        if (currentFilter === 'stock-bajo') {
+          productosFiltrados = productos.filter(p => p.stock > 0 && p.stock < 20);
+        } else if (currentFilter === 'sin-stock') {
+          productosFiltrados = productos.filter(p => p.stock === 0);
+        } else {
+          productosFiltrados = productos.filter(p => p.categoria === currentFilter);
+        }
+      }
+      
+      // Aplicar búsqueda
+      const searchTerm = document.getElementById('search-productos')?.value.toLowerCase();
+      if (searchTerm) {
+        productosFiltrados = productosFiltrados.filter(p => 
+          p.nombre.toLowerCase().includes(searchTerm) ||
+          p.categoria.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      if (productosFiltrados.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay productos con este filtro</td></tr>';
+        return;
+      }
+      
+      productosFiltrados.forEach((p, index) => {
+        let badge = '';
+        if (p.stock === 0) {
+          badge = '<span class="badge hot">❌ AGOTADO</span>';
+        } else if (p.stock < 20) {
+          badge = '<span class="badge low-stock">⚠️ STOCK BAJO</span>';
+        } else {
+          badge = '<span class="badge trending">✓ DISPONIBLE</span>';
+        }
+        
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${index + 1}</strong></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:15px;">
+                <img src="${p.imagen}" class="product-img" alt="${p.nombre}">
+                <strong>${p.nombre}</strong>
+              </div>
+            </td>
+            <td><strong>${formatBRL(p.precio)}</strong></td>
+            <td>${p.stock} unidades</td>
+            <td>${p.categoria}</td>
+            <td>${badge}</td>
+            <td>
+              <button class="btn-edit" onclick="editarProducto(${p.id})">✏️ Editar</button>
+              <button class="btn-delete" onclick="eliminarProducto(${p.id})">🗑️</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function filtrarProductos(filtro) {
+      currentFilter = filtro;
+      
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      
+      renderizarProductos();
+    }
+
+    function buscarProductos() {
+      renderizarProductos();
+    }
+
+    function guardarProducto(e) {
+      e.preventDefault();
+      
+      const producto = {
+        id: editingId || generarId(),
+        nombre: document.getElementById('producto_nombre').value.trim(),
+        precio: parseFloat(document.getElementById('producto_precio').value),
+        imagen: document.getElementById('producto_imagen').value.trim(),
+        imagenes: [document.getElementById('producto_imagen').value.trim()],
+        categoria: document.getElementById('producto_categoria').value,
+        stock: parseInt(document.getElementById('producto_stock').value),
+        descripcion: document.getElementById('producto_descripcion').value.trim()
+      };
+      
+      if (editingId) {
+        const index = productos.findIndex(p => p.id === editingId);
+        productos[index] = producto;
+        alert('✅ Producto actualizado correctamente');
+      } else {
+        productos.push(producto);
+        alert('✅ Producto agregado correctamente');
+      }
+      
+      localStorage.setItem('flashbuy_productos', JSON.stringify(productos));
+      
+      limpiarFormulario();
+      actualizarDashboard();
+      renderizarProductos();
+      switchSection('productos');
+    }
+
+    function editarProducto(id) {
+      const producto = productos.find(p => p.id === id);
+      if (!producto) return;
+      
+      editingId = id;
+      document.getElementById('form-title').textContent = '✏️ Editar Producto';
+      document.getElementById('btn-submit').textContent = '💾 Actualizar Producto';
+      
+      document.getElementById('producto_nombre').value = producto.nombre;
+      document.getElementById('producto_precio').value = producto.precio;
+      document.getElementById('producto_categoria').value = producto.categoria;
+      document.getElementById('producto_stock').value = producto.stock;
+      document.getElementById('producto_descripcion').value = producto.descripcion || '';
+      document.getElementById('producto_imagen').value = producto.imagen;
+      
+      switchSection('agregar-producto');
+    }
+
+    function eliminarProducto(id) {
+      if (!confirm('¿Estás seguro de eliminar este producto?')) return;
+      
+      productos = productos.filter(p => p.id !== id);
+      localStorage.setItem('flashbuy_productos', JSON.stringify(productos));
+      
+      renderizarProductos();
+      actualizarDashboard();
+      alert('🗑️ Producto eliminado correctamente');
+    }
+
+    function cancelarEdicion() {
+      limpiarFormulario();
+      switchSection('productos');
+    }
+
+    function limpiarFormulario() {
+      document.getElementById('productoForm').reset();
+      document.getElementById('form-title').textContent = '➕ Agregar Nuevo Producto';
+      document.getElementById('btn-submit').textContent = '💾 Guardar Producto';
+      editingId = null;
+    }
+
+    function generarId() {
+      return productos.length > 0 ? Math.max(...productos.map(p => p.id)) + 1 : 1;
+    }
+
+    // ============================================
+    // PEDIDOS
+    // ============================================
+    function renderizarPedidos() {
+      const tbody = document.getElementById('pedidos-tbody');
+      tbody.innerHTML = '';
+      
+      if (pedidos.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay pedidos registrados</td></tr>';
+        return;
+      }
+      
+      pedidos.forEach(p => {
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>#${p.id}</strong></td>
+            <td>${p.cliente}</td>
+            <td>${p.productos} item(s)</td>
+            <td><strong>${formatBRL(p.total)}</strong></td>
+            <td><span class="order-status ${p.estado}">${p.estado.toUpperCase()}</span></td>
+            <td>${new Date(p.fecha).toLocaleDateString('es')}</td>
+            <td>
+              <button class="btn-edit" onclick="cambiarEstadoPedido(${p.id})">🔄 Cambiar Estado</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function agregarPedidoDemo() {
+      const id = pedidos.length + 1;
+      const pedido = {
+        id: id,
+        cliente: 'Cliente Demo #' + id,
+        productos: Math.floor(Math.random() * 3) + 1,
+        total: Math.random() * 200 + 50,
+        estado: 'pending',
+        fecha: new Date().toISOString()
+      };
+      
+      pedidos.push(pedido);
+      localStorage.setItem('flashbuy_pedidos', JSON.stringify(pedidos));
+      renderizarPedidos();
+      alert('✅ Pedido demo agregado');
+    }
+
+    function cambiarEstadoPedido(id) {
+      const pedido = pedidos.find(p => p.id === id);
+      if (!pedido) return;
+      
+      const estados = ['pending', 'processing', 'shipped', 'delivered'];
+      const currentIndex = estados.indexOf(pedido.estado);
+      pedido.estado = estados[(currentIndex + 1) % estados.length];
+      
+      localStorage.setItem('flashbuy_pedidos', JSON.stringify(pedidos));
+      renderizarPedidos();
+    }
+
+    // ============================================
+    // CLIENTES
+    // ============================================
+    function renderizarClientes() {
+      const tbody = document.getElementById('clientes-tbody');
+      tbody.innerHTML = '';
+      
+      if (clientes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay clientes registrados</td></tr>';
+        return;
+      }
+      
+      clientes.forEach(c => {
+        const segmento = c.totalGastado > 500 ? 'vip' : c.compras > 5 ? 'regular' : 'new';
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${c.id}</strong></td>
+            <td>${c.nombre}</td>
+            <td>${c.email}</td>
+            <td>${c.telefono}</td>
+            <td>${c.compras}</td>
+            <td><strong>${formatBRL(c.totalGastado)}</strong></td>
+            <td><span class="customer-segment ${segmento}">${segmento.toUpperCase()}</span></td>
+          </tr>
+        `;
+      });
+    }
+
+    function agregarClienteDemo() {
+      const id = clientes.length + 1;
+      const cliente = {
+        id: id,
+        nombre: 'Cliente #' + id,
+        email: `cliente${id}@email.com`,
+        telefono: '+57 300 000 00' + (10 + id),
+        compras: Math.floor(Math.random() * 10),
+        totalGastado: Math.random() * 1000
+      };
+      
+      clientes.push(cliente);
+      localStorage.setItem('flashbuy_clientes', JSON.stringify(clientes));
+      renderizarClientes();
+      alert('✅ Cliente demo agregado');
+    }
+
+    // ============================================
+    // MARKETING - CUPONES
+    // ============================================
+    function mostrarFormCupon() {
+      document.getElementById('form-cupon').style.display = 'block';
+    }
+
+    function ocultarFormCupon() {
+      document.getElementById('form-cupon').style.display = 'none';
+      document.getElementById('cuponForm').reset();
+    }
+
+    function guardarCupon(e) {
+      e.preventDefault();
+      
+      const cupon = {
+        id: cupones.length + 1,
+        codigo: document.getElementById('cupon_codigo').value.toUpperCase(),
+        descuento: parseInt(document.getElementById('cupon_descuento').value),
+        expiracion: document.getElementById('cupon_expiracion').value,
+        usos: parseInt(document.getElementById('cupon_usos').value) || 999,
+        usosActuales: 0
+      };
+      
+      cupones.push(cupon);
+      localStorage.setItem('flashbuy_cupones', JSON.stringify(cupones));
+      
+      renderizarCupones();
+      ocultarFormCupon();
+      alert('✅ Cupón creado correctamente');
+    }
+
+    function renderizarCupones() {
+      const container = document.getElementById('cupones-list');
+      container.innerHTML = '';
+      
+      if (cupones.length === 0) {
+        container.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">No hay cupones creados</p>';
+        return;
+      }
+      
+      cupones.forEach(c => {
+        container.innerHTML += `
+          <div class="coupon-card">
+            <div class="coupon-code">${c.codigo}</div>
+            <p><strong>${c.descuento}%</strong> de descuento</p>
+            <p>📅 Válido hasta: ${new Date(c.expiracion).toLocaleDateString('es')}</p>
+            <p>🎫 Usos: ${c.usosActuales} / ${c.usos}</p>
+            <button class="btn-delete" onclick="eliminarCupon(${c.id})" style="margin-top:10px;">🗑️ Eliminar</button>
+          </div>
+        `;
+      });
+    }
+
+    function eliminarCupon(id) {
+      if (!confirm('¿Eliminar este cupón?')) return;
+      cupones = cupones.filter(c => c.id !== id);
+      localStorage.setItem('flashbuy_cupones', JSON.stringify(cupones));
+      renderizarCupones();
+    }
+
+    // ============================================
+    // ENVÍOS
+    // ============================================
+    function renderizarZonasEnvio() {
+      const container = document.getElementById('zonas-envio-list');
+      container.innerHTML = '';
+      
+      zonasEnvio.forEach(z => {
+        container.innerHTML += `
+          <div class="shipping-zone">
+            <h4>${z.nombre}</h4>
+            <div class="shipping-rate">
+              <span>${z.descripcion}</span>
+              <strong>${formatBRL(z.tarifa)}</strong>
+            </div>
+            <button class="btn-edit" onclick="editarZona(${z.id})">✏️ Editar</button>
+            <button class="btn-delete" onclick="eliminarZona(${z.id})">🗑️ Eliminar</button>
+          </div>
+        `;
+      });
+    }
+
+    function agregarZonaEnvio() {
+      const nombre = prompt('Nombre de la zona:');
+      if (!nombre) return;
+      
+      const tarifa = parseFloat(prompt('Tarifa de envío:'));
+      if (isNaN(tarifa)) return;
+      
+      const descripcion = prompt('Descripción:') || '';
+      
+      zonasEnvio.push({
+        id: zonasEnvio.length + 1,
+        nombre,
+        tarifa,
+        descripcion
+      });
+      
+      localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
+      renderizarZonasEnvio();
+    }
+
+    function editarZona(id) {
+      const zona = zonasEnvio.find(z => z.id === id);
+      if (!zona) return;
+      
+      const tarifa = parseFloat(prompt('Nueva tarifa:', zona.tarifa));
+      if (!isNaN(tarifa)) {
+        zona.tarifa = tarifa;
+        localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
+        renderizarZonasEnvio();
+      }
+    }
+
+    function eliminarZona(id) {
+      if (!confirm('¿Eliminar esta zona?')) return;
+      zonasEnvio = zonasEnvio.filter(z => z.id !== id);
+      localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
+      renderizarZonasEnvio();
+    }
+
+    // ============================================
+    // CONFIGURACIÓN
+    // ============================================
+    function cargarConfiguracion() {
+      const mantenimiento = localStorage.getItem('flashbuy_mantenimiento') === 'true';
+      document.getElementById('toggle-mantenimiento').checked = mantenimiento;
+    }
+
+    function toggleMantenimiento() {
+      const activo = document.getElementById('toggle-mantenimiento').checked;
+      localStorage.setItem('flashbuy_mantenimiento', activo);
+      
+      if (activo) {
+        alert('⚠️ Modo mantenimiento ACTIVADO\nLa tienda mostrará una página de mantenimiento.');
+      } else {
+        alert('✅ Modo mantenimiento DESACTIVADO\nLa tienda está operativa.');
+      }
+    }
+
+    function limpiarDatos() {
+      if (!confirm('⚠️ ¿Estás seguro? Esto eliminará TODOS los datos del admin.')) return;
+      if (!confirm('🚨 ÚLTIMA CONFIRMACIÓN: Se perderán productos, pedidos, clientes, cupones y configuración.')) return;
+      
+      localStorage.removeItem('flashbuy_productos');
+      localStorage.removeItem('flashbuy_pedidos');
+      localStorage.removeItem('flashbuy_clientes');
+      localStorage.removeItem('flashbuy_cupones');
+      localStorage.removeItem('flashbuy_zonas_envio');
+      
+      alert('🗑️ Datos eliminados. Recargando página...');
+      location.reload();
+    }
+
+    function exportarDatos() {
+      const datos = {
+        productos,
+        pedidos,
+        clientes,
+        cupones,
+        zonasEnvio,
+        fecha: new Date().toISOString()
+      };
+      
+      const dataStr = JSON.stringify(datos, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `flashbuy-backup-${Date.now()}.json`;
+      link.click();
+      
+      alert('📥 Datos exportados correctamente');
+    }
+  </script>
+
+</body>
+</html>
