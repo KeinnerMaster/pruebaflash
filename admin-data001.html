@@ -587,6 +587,37 @@
     localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
   }
 }
+
+  // Cargar pedidos
+  const savedOrders = localStorage.getItem('flashbuy_pedidos');
+  if (savedOrders) {
+    pedidos = JSON.parse(savedOrders);
+  }
+
+  // Cargar clientes
+  const savedClientes = localStorage.getItem('flashbuy_clientes');
+  if (savedClientes) {
+    clientes = JSON.parse(savedClientes);
+  }
+
+  // Cargar cupones
+  const savedCupones = localStorage.getItem('flashbuy_cupones');
+  if (savedCupones) {
+    cupones = JSON.parse(savedCupones);
+  }
+
+  // Cargar zonas de envío
+  const savedZonas = localStorage.getItem('flashbuy_zonas_envio');
+  if (savedZonas) {
+    zonasEnvio = JSON.parse(savedZonas);
+  } else {
+    zonasEnvio = [
+      { id: 1, nombre: 'Nacional', tarifa: 15.00, descripcion: 'Envío a todo el país' },
+      { id: 2, nombre: 'Local', tarifa: 5.00, descripcion: 'Zona metropolitana' }
+    ];
+    localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
+  }
+}
     }
 
     // ============================================
