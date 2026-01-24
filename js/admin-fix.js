@@ -1,45 +1,69 @@
+/**
+ * ADMIN FIX SCRIPT - FlashBuy
+ * Este script fuerza la activación de los menús y corrige errores de carga.
+ */
+
 (function() {
-    // Configuración
-    const DASHBOARD_URL = 'admin-data001.html';
-    const LOGIN_URL = 'admin-login.html';
-    const SESSION_KEY = 'flashbuy_admin_session';
-    // 1. Lógica de Redirección Inteligente
-    const session = localStorage.getItem(SESSION_KEY);
-    const path = window.location.pathname;
-    
-    // Si estamos en el login y hay sesión -> ir al dashboard
-    if (path.includes(LOGIN_URL) && session) {
-        window.location.href = DASHBOARD_URL;
+    console.log("🚀 Aplicando parches de seguridad y navegación...");
+
+    // 1. Asegurar que la sesión sea válida
+    const sessionRaw = localStorage.getItem('flashbuy_admin_session');
+    if (!sessionRaw) {
+        console.warn("No hay sesión, redirigiendo...");
+        window.location.href = 'admin-login.html';
+        return;
     }
-    
-    // Si estamos en el dashboard y NO hay sesión -> ir al login
-    if (path.includes(DASHBOARD_URL) && !session) {
-        window.location.href = LOGIN_URL;
+
+    const session = JSON.parse(sessionRaw);
+
+    // 2. Forzar que el rol sea 'owner' si es DATA001 para desbloquear todo
+    if (session.id === 'DATA001') {
+        session.role = 'owner';
+        localStorage.setItem('flashbuy_admin_session', JSON.stringify(session));
     }
-    // 2. Lógica del Menú Lateral (Solo se ejecuta si existen los elementos)
-    document.addEventListener('DOMContentLoaded', function() {
+
+    // 3. Función para cambiar de sección (Desbloqueo de menús)
+    window.showSection = function(sectionId) {
+        console.log("Cambiando a sección:", sectionId);
+        
+        // Ocultar todas las secciones
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        
+        // Mostrar la seleccionada
+        const target = document.getElementById(sectionId);
+        if (target) {
+            target.classList.add('active');
+        } else {
+            console.error("Sección no encontrada:", sectionId);
+        }
+
+        // Actualizar menú lateral
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        const activeMenu = document.querySelector([onclick="showSection('${sectionId}')"]);
+        if (activeMenu) activeMenu.classList.add('active');
+    };
+
+    // 4. Re-vincular clics en el menú lateral al cargar
+    window.addEventListener('DOMContentLoaded', () => {
         const menuItems = document.querySelectorAll('.menu-item');
-        const sections = document.querySelectorAll('.section');
-        if (menuItems.length > 0) {
-            menuItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    // Si es un enlace real a otra página, dejamos que navegue
-                    if (this.getAttribute('href') && !this.getAttribute('href').startsWith('#')) return;
-                    e.preventDefault();
-                    
-                    // Actualizar clase visual 'active'
-                    menuItems.forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                    // Mostrar la sección correspondiente
-                    const targetId = this.getAttribute('href')?.replace('#', '') || this.getAttribute('data-target');
-                    if (targetId) {
-                        sections.forEach(sec => {
-                            sec.classList.remove('active');
-                            if (sec.id === targetId) sec.classList.add('active');
-                        });
-                    }
-                });
-            });
+        menuItems.forEach(item => {
+            const section = item.getAttribute('data-section');
+            if (section) {
+                item.onclick = () => showSection(section);
+            }
+        });
+
+        // Mostrar dashboard por defecto
+        showSection('dashboard');
+    });
+
+    // 5. Parche para botones que no responden
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.menu-item');
+        if (btn && !btn.onclick) {
+            const section = btn.getAttribute('data-section');
+            if (section) showSection(section);
         }
     });
+
 })();
