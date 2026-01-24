@@ -384,7 +384,7 @@
         // Login exitoso
         const sessionData = {
           id: admins.id,
-          name: admins.name,
+          name: admins.id, // Usamos id como name ya que eliminamos la columna name
           role: admins.role,
           email: admins.email,
           loginTime: new Date().toISOString()
@@ -392,8 +392,9 @@
         
         localStorage.setItem('flashbuy_admin_session', JSON.stringify(sessionData));
 
-        // Redirigir al admin
-        window.location.href = 'admin-data001.html';
+        // Redirigir al admin usando una ruta absoluta o relativa clara
+        console.log('Login exitoso, redirigiendo...');
+        window.location.replace('admin-data001.html');
       } catch (err) {
         console.error('Error de login:', err);
         btnLogin.classList.remove('loading');
