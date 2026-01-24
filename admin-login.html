@@ -317,16 +317,19 @@
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <script>
-    // Configuración de Supabase
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
 const SUPABASE_URL = 'https://wjvhvcwnkawjtreavirm.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indqdmh2Y3dua2F3anRyZWF2aXJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNzA0MTQsImV4cCI6MjA4NDg0NjQxNH0.gKj9eBsXKoJG5PePRZyt-Vm8oQfbYXKOb77biE32nxg';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_KEY = 'TU_PUBLIC_ANON_KEY';
+const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Auto redirect si ya hay sesión
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   const session = localStorage.getItem('flashbuy_admin_session');
-  if (session) window.location.href = 'admin-data001.html';
+  if (session) {
+    window.location.href = 'admin-data001.html';
+  }
 });
 
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -334,15 +337,10 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
-  const btnLogin = document.getElementById('btnLogin');
+  const btn = document.getElementById('btnLogin');
 
-  if (!grecaptcha.getResponse()) {
-    mostrarError('Completa el reCAPTCHA');
-    return;
-  }
-
-  btnLogin.classList.add('loading');
-  btnLogin.disabled = true;
+  btn.disabled = true;
+  btn.classList.add('loading');
 
   try {
     const { data, error } = await supabase.rpc('admin_login', {
@@ -350,16 +348,15 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
       p_password: password
     });
 
-    if (error || !data) throw error;
-
-    const admin = Array.isArray(data) ? data[0] : data;
-    if (!admin || !admin.id) {
+    if (error || !data || data.length === 0) {
       mostrarError('Usuario o contraseña incorrectos');
       return;
     }
 
+    const admin = data[0];
+
     if (!admin.sesion_activa) {
-      mostrarError('Tu cuenta está desactivada');
+      mostrarError('Cuenta desactivada');
       return;
     }
 
@@ -368,7 +365,6 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
       name: admin.name,
       email: admin.email,
       role: admin.role,
-      sesion_activa: admin.sesion_activa,
       loginTime: new Date().toISOString()
     }));
 
@@ -378,9 +374,8 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     console.error(err);
     mostrarError('Error al iniciar sesión');
   } finally {
-    btnLogin.classList.remove('loading');
-    btnLogin.disabled = false;
-    grecaptcha.reset();
+    btn.disabled = false;
+    btn.classList.remove('loading');
   }
 });
 
@@ -388,7 +383,7 @@ function mostrarError(msg) {
   const el = document.getElementById('error-message');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 5000);
+  setTimeout(() => el.classList.remove('show'), 4000);
 }
 </script>
 </body>
