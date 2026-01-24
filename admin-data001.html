@@ -6,10 +6,11 @@
   <title>Admin Dashboard - FlashBuy</title>
   <script defer src="https://cloud.umami.is/script.js" data-website-id="f974dcbb-29aa-4518-89ec-ab9e4abce31d"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; display: flex; height: 100vh; overflow: hidden; }
+    
+    /* SIDEBAR */
     .sidebar { width: 280px; background: linear-gradient(180deg, #0B1320 0%, #1a2942 100%); color: white; position: fixed; left: 0; top: 0; height: 100vh; z-index: 100; box-shadow: 4px 0 20px rgba(0,0,0,0.15); display: flex; flex-direction: column; transition: transform 0.3s; }
     .sidebar-header { padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
     .sidebar-logo { width: 180px; height: auto; }
@@ -25,12 +26,16 @@
     .user-name { font-weight: 600; font-size: 14px; }
     .user-role { font-size: 12px; color: rgba(255,255,255,0.6); }
     .user-badge { display: inline-block; padding: 2px 8px; background: #FFD700; color: #000; border-radius: 4px; font-size: 10px; font-weight: bold; margin-top: 3px; }
+    
+    /* USER MENU DROPDOWN */
     .user-menu-dropdown { position: absolute; bottom: 70px; left: 20px; right: 20px; background: white; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); display: none; z-index: 200; overflow: hidden; }
     .user-menu-dropdown.active { display: block; animation: slideUp 0.3s; }
     @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .user-menu-item { padding: 15px 20px; border-bottom: 1px solid #f0f0f0; cursor: pointer; color: #333; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
     .user-menu-item:hover { background: #f8f9fa; }
     .user-menu-item:last-child { border-bottom: none; }
+    
+    /* MAIN */
     .main-content { margin-left: 280px; flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
     .top-bar { background: white; padding: 20px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
     .top-bar-left h1 { font-size: 24px; color: #0B1320; margin: 0; }
@@ -38,11 +43,15 @@
     .btn-visit-store { padding: 10px 20px; background: #FF7A00; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s; }
     .btn-visit-store:hover { background: #e66d00; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,122,0,0.3); }
     .content-area { flex: 1; overflow-y: auto; padding: 30px; }
+    
+    /* SECTIONS */
     .section { display: none; }
     .section.active { display: block; animation: fadeIn 0.3s; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* STATS */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-    .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s; border-left: 4px solid #FF7A00; }
+    .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.3s; border-left: 4px solid #FF7A00; position: relative; overflow: hidden; }
     .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
     .stat-card.blue { border-left-color: #2196F3; }
     .stat-card.green { border-left-color: #4CAF50; }
@@ -50,65 +59,39 @@
     .stat-card h3 { margin: 0; color: #666; font-size: 13px; text-transform: uppercase; font-weight: 600; }
     .stat-number { font-size: 32px; font-weight: bold; color: #0B1320; margin: 10px 0; }
     .stat-change { font-size: 13px; color: #4CAF50; }
+    
+    /* CHARTS */
     .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 25px; margin-bottom: 30px; }
     .chart-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
     .chart-card h3 { margin: 0 0 20px 0; color: #0B1320; font-size: 18px; font-weight: 600; }
-    .table-container { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 30px; overflow-x: auto; }
-    .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-    .table-header h3 { margin: 0; font-size: 20px; color: #0B1320; font-weight: 600; }
-    .table-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .search-box { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; width: 250px; transition: border-color 0.3s; }
-    .search-box:focus { outline: none; border-color: #FF7A00; }
-    .data-table { width: 100%; border-collapse: collapse; min-width: 800px; }
-    .data-table thead { background: #f8f9fa; }
-    .data-table th { padding: 15px; text-align: left; font-weight: 600; color: #0B1320; border-bottom: 2px solid #e0e0e0; font-size: 13px; text-transform: uppercase; }
-    .data-table td { padding: 15px; border-bottom: 1px solid #f0f0f0; color: #555; font-size: 14px; }
-    .data-table tbody tr:hover { background: #f8f9fa; }
-    .product-img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
-    .badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
-    .badge.hot { background: #ffebee; color: #c62828; }
-    .badge.trending { background: #e8f5e9; color: #2e7d32; }
-    .badge.low-stock { background: #fff3e0; color: #ef6c00; }
-    .btn { padding: 10px 20px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
-    .btn-primary { background: #FF7A00; color: white; }
-    .btn-primary:hover { background: #e66d00; transform: translateY(-2px); }
-    .btn-secondary { background: #6c757d; color: white; }
-    .btn-edit { background: #0B1320; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; }
-    .btn-delete { background: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; }
-    .filter-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .filter-btn { padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.3s; }
-    .filter-btn:hover { border-color: #FF7A00; color: #FF7A00; }
-    .filter-btn.active { background: #FF7A00; color: white; border-color: #FF7A00; }
-    .form-section { background: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .form-section h2 { margin: 0 0 25px 0; color: #0B1320; font-size: 22px; font-weight: 600; }
-    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-    .form-group { margin-bottom: 20px; }
-    .form-group.full-width { grid-column: 1 / -1; }
-    .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #0B1320; font-size: 14px; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; transition: border-color 0.3s; font-family: inherit; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #FF7A00; }
-    .form-group textarea { resize: vertical; min-height: 100px; }
-    .form-actions { display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap; }
+    
+    /* IMAGE UPLOAD - MEJORADO */
     .image-upload-section { margin-bottom: 30px; }
     .image-upload-area { border: 3px dashed #e0e0e0; border-radius: 12px; padding: 30px; text-align: center; background: #f8f9fa; transition: all 0.3s; cursor: pointer; margin-bottom: 20px; }
-    .image-upload-area:hover { border-color: #FF7A00; background: #fff3e6; }
+    .image-upload-area:hover, .image-upload-area.dragover { border-color: #FF7A00; background: #fff3e6; }
     .image-upload-area input[type="file"] { display: none; }
     .upload-icon { font-size: 48px; color: #FF7A00; margin-bottom: 15px; }
     .upload-text { color: #666; font-size: 14px; }
+    
     .images-container { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-top: 20px; }
-    .main-image-section { background: white; border: 3px solid #FF7A00; border-radius: 12px; padding: 15px; }
-    .main-image-section h4 { margin: 0 0 15px 0; color: #FF7A00; font-size: 14px; font-weight: 600; }
+    .main-image-section { background: white; border: 3px solid #FF7A00; border-radius: 12px; padding: 15px; position: relative; }
+    .main-image-section h4 { margin: 0 0 15px 0; color: #FF7A00; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
     .main-image-preview { width: 100%; aspect-ratio: 1; border-radius: 8px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #999; font-size: 14px; position: relative; overflow: hidden; border: 2px dashed #e0e0e0; }
     .main-image-preview img { width: 100%; height: 100%; object-fit: cover; }
     .main-image-preview.empty::before { content: 'Imagen Principal'; }
+    
     .other-images-section { background: white; border: 2px solid #e0e0e0; border-radius: 12px; padding: 15px; }
     .other-images-section h4 { margin: 0 0 15px 0; color: #0B1320; font-size: 14px; font-weight: 600; }
     .images-preview { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
     .image-preview-item { position: relative; border-radius: 8px; overflow: hidden; border: 2px solid #e0e0e0; cursor: grab; transition: all 0.3s; aspect-ratio: 1; }
+    .image-preview-item:active { cursor: grabbing; }
     .image-preview-item:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .image-preview-item.dragging { opacity: 0.5; transform: scale(0.95); }
     .image-preview-item img { width: 100%; height: 100%; object-fit: cover; }
     .image-preview-item .remove-btn { position: absolute; top: 5px; right: 5px; background: rgba(220,53,69,0.9); color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; z-index: 10; }
     .image-preview-item .make-main-btn { position: absolute; bottom: 5px; left: 5px; right: 5px; background: rgba(255,122,0,0.95); color: white; border: none; border-radius: 4px; padding: 4px; font-size: 10px; font-weight: bold; cursor: pointer; }
+    
+    /* VARIANTS - MEJORADO */
     .variants-section { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 20px; }
     .variants-toggle { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
     .variants-toggle:hover { background: #fff3e6; }
@@ -124,37 +107,102 @@
     .variant-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .variant-tag { background: white; border: 2px solid #FF7A00; padding: 8px 15px; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: #FF7A00; font-weight: 600; }
     .variant-tag .remove { cursor: pointer; color: #dc3545; font-weight: bold; }
-    .order-status { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+    
+    /* TABLES */
+    .table-container { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 30px; overflow-x: auto; }
+    .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+    .table-header h3 { margin: 0; font-size: 20px; color: #0B1320; font-weight: 600; }
+    .table-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .search-box { padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; width: 250px; transition: border-color 0.3s; }
+    .search-box:focus { outline: none; border-color: #FF7A00; }
+    .data-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+    .data-table thead { background: #f8f9fa; }
+    .data-table th { padding: 15px; text-align: left; font-weight: 600; color: #0B1320; border-bottom: 2px solid #e0e0e0; font-size: 13px; text-transform: uppercase; }
+    .data-table td { padding: 15px; border-bottom: 1px solid #f0f0f0; color: #555; font-size: 14px; }
+    .data-table tbody tr:hover { background: #f8f9fa; }
+    .product-img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+    
+    /* BADGES */
+    .badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+    .badge.hot { background: #ffebee; color: #c62828; }
+    .badge.trending { background: #e8f5e9; color: #2e7d32; }
+    .badge.low-stock { background: #fff3e0; color: #ef6c00; }
+    
+    /* BUTTONS */
+    .btn { padding: 10px 20px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary { background: #FF7A00; color: white; }
+    .btn-primary:hover { background: #e66d00; transform: translateY(-2px); }
+    .btn-secondary { background: #6c757d; color: white; }
+    .btn-edit { background: #0B1320; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; }
+    .btn-delete { background: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; }
+    
+    /* FILTERS */
+    .filter-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-btn { padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.3s; }
+    .filter-btn:hover { border-color: #FF7A00; color: #FF7A00; }
+    .filter-btn.active { background: #FF7A00; color: white; border-color: #FF7A00; }
+    
+    /* FORMS */
+    .form-section { background: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .form-section h2 { margin: 0 0 25px 0; color: #0B1320; font-size: 22px; font-weight: 600; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group.full-width { grid-column: 1 / -1; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #0B1320; font-size: 14px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; transition: border-color 0.3s; font-family: inherit; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #FF7A00; }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-actions { display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap; }
+    
+    /* ORDER STATUS - MEJORADO CON MENÚ */
+    .order-status { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: all 0.2s; position: relative; }
     .order-status:hover { transform: scale(1.05); }
     .order-status.pending { background: #fff3e0; color: #ef6c00; }
     .order-status.processing { background: #e3f2fd; color: #1565c0; }
     .order-status.shipped { background: #e8f5e9; color: #2e7d32; }
     .order-status.delivered { background: #c8e6c9; color: #1b5e20; }
     .order-status.cancelled { background: #ffebee; color: #c62828; }
+    
+    /* STATUS MENU - MEJORADO */
     .status-menu { position: relative; display: inline-block; }
     .status-dropdown { position: absolute; top: 100%; left: 0; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); display: none; z-index: 100; margin-top: 5px; min-width: 220px; overflow: hidden; }
-    .status-dropdown.active { display: block; }
+    .status-dropdown.active { display: block; animation: fadeIn 0.2s; }
     .status-option { padding: 12px 20px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; border-left: 4px solid transparent; }
     .status-option:hover { background: #f8f9fa; }
+    .status-option.pending { border-left-color: #ef6c00; }
+    .status-option.pending:hover { background: #fff3e0; }
+    .status-option.processing { border-left-color: #1565c0; }
+    .status-option.processing:hover { background: #e3f2fd; }
+    .status-option.shipped { border-left-color: #2e7d32; }
+    .status-option.shipped:hover { background: #e8f5e9; }
+    .status-option.delivered { border-left-color: #1b5e20; }
+    .status-option.delivered:hover { background: #c8e6c9; }
+    .status-option.cancelled { border-left-color: #c62828; }
+    .status-option.cancelled:hover { background: #ffebee; }
+    
+    /* CUSTOMER */
     .customer-segment { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; }
     .customer-segment.vip { background: #ffd700; color: #8b6914; }
     .customer-segment.regular { background: #e3f2fd; color: #1565c0; }
     .customer-segment.new { background: #e8f5e9; color: #2e7d32; }
-    .coupon-card { background: white; padding: 20px; border-radius: 12px; border-left: 4px solid #FF7A00; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
-    .coupon-info { flex: 1; }
-    .coupon-code { font-size: 24px; font-weight: bold; color: #FF7A00; font-family: 'Courier New', monospace; margin-bottom: 10px; }
-    .coupon-details { color: #666; font-size: 14px; }
-    .coupon-details p { margin: 5px 0; }
-    .coupon-actions { display: flex; gap: 10px; }
+
+     /* COUPON */
+    .coupon-card { background: white; padding: 20px; border-radius: 12px; border-left: 4px solid #FF7A00; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .coupon-code { font-size: 24px; font-weight: bold; color: #FF7A00; font-family: 'Courier New', monospace; }
+
+    /* SHIPPING */
     .shipping-zone { background: white; padding: 20px; border-radius: 12px; border: 2px solid #e0e0e0; margin-bottom: 15px; }
     .shipping-zone h4 { margin: 0 0 15px 0; color: #0B1320; }
     .shipping-rate { display: flex; justify-content: space-between; padding: 12px; background: #f8f9fa; border-radius: 6px; margin-bottom: 8px; }
-    .shipping-actions { display: flex; gap: 10px; margin-top: 15px; }
+    
+    /* MODAL */
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; }
     .modal-overlay.active { display: flex; animation: fadeIn 0.3s; }
     .modal { background: white; border-radius: 16px; padding: 30px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; position: relative; }
     .modal h2 { margin: 0 0 20px 0; color: #0B1320; }
     .modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+    
+    /* ADMIN MANAGEMENT - MEJORADO */
     .admin-card { background: white; padding: 20px; border-radius: 12px; border: 2px solid #e0e0e0; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
     .admin-card:hover { border-color: #FF7A00; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .admin-info { display: flex; align-items: center; gap: 15px; flex: 1; }
@@ -166,6 +214,8 @@
     .admin-role-badge.moderator { background: #2196F3; color: white; }
     .admin-role-badge.publisher { background: #4CAF50; color: white; }
     .admin-actions { display: flex; gap: 10px; }
+
+    /* SETTINGS */
     .settings-section { background: white; padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
     .settings-section h3 { margin: 0 0 20px 0; color: #0B1320; font-size: 18px; font-weight: 600; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
     .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f0f0f0; }
@@ -178,7 +228,20 @@
     .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: 0.3s; border-radius: 50%; }
     .toggle-switch input:checked + .toggle-slider { background-color: #FF7A00; }
     .toggle-switch input:checked + .toggle-slider:before { transform: translateX(24px); }
+    
+    /* PROFILE SELECTOR */
+    .profile-selector { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+    .profile-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+    .profile-option { padding: 20px; border: 2px solid #e0e0e0; border-radius: 12px; cursor: pointer; transition: all 0.3s; text-align: center; }
+    .profile-option:hover { border-color: #FF7A00; background: #fff3e6; transform: translateY(-3px); }
+    .profile-option.active { border-color: #FF7A00; background: #fff3e6; }
+    .profile-option-avatar { width: 60px; height: 60px; border-radius: 50%; background: #FF7A00; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: white; margin: 0 auto 10px; }
+    .profile-option-name { font-weight: 600; color: #0B1320; margin-bottom: 5px; }
+    .profile-option-role { font-size: 12px; color: #666; }
+    
+    /* MOBILE */
     .mobile-menu-btn { display: none; position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: #FF7A00; color: white; border: none; border-radius: 50%; font-size: 24px; cursor: pointer; box-shadow: 0 4px 20px rgba(255,122,0,0.4); z-index: 99; }
+    
     @media (max-width: 1024px) {
       .sidebar { transform: translateX(-100%); }
       .sidebar.open { transform: translateX(0); }
@@ -188,6 +251,7 @@
       .form-grid { grid-template-columns: 1fr; }
       .images-container { grid-template-columns: 1fr; }
     }
+    
     @media (max-width: 768px) {
       .stats-grid { grid-template-columns: 1fr; }
       .content-area { padding: 20px 15px; }
@@ -218,30 +282,27 @@
       </a>
       <a class="menu-item" data-section="marketing">
         <span class="menu-item-icon">🎯</span><span>Marketing</span>
-      </a>
+        </a>
       <a class="menu-item" data-section="envios">
         <span class="menu-item-icon">🚚</span><span>Envíos</span>
-      </a>
-      <a class="menu-item" data-section="configuracion">
-        <span class="menu-item-icon">⚙️</span><span>Configuración</span>
       </a>
       <a class="menu-item" data-section="administradores" id="menu-admin" style="display:none;">
         <span class="menu-item-icon">👔</span><span>Administradores</span>
       </a>
+      <a class="menu-item" data-section="configuracion">
+        <span class="menu-item-icon">⚙️</span><span>Configuración</span>
+      </a>
     </nav>
     <div class="sidebar-footer">
       <div class="user-info" id="userInfoBtn">
-        <div class="user-avatar" id="userAvatar">D</div>
+        <div class="user-avatar" id="userAvatar">A</div>
         <div>
-          <div class="user-name" id="userName">DATA001</div>
+          <div class="user-name" id="userName">Admin FlashBuy</div>
           <div class="user-role" id="userRole">Administrador</div>
           <div class="user-badge" id="userBadge">OWNER</div>
         </div>
       </div>
       <div class="user-menu-dropdown" id="userMenuDropdown">
-        <div class="user-menu-item" onclick="mostrarCambioContrasena()">
-          🔑 Cambiar Contraseña
-        </div>
         <div class="user-menu-item" onclick="mostrarCambioPerfil()">
           👤 Cambiar Perfil
         </div>
@@ -368,6 +429,7 @@
           <form id="productoForm" onsubmit="guardarProducto(event)">
             <input type="hidden" id="editing_id" value="">
             
+            <!-- UPLOAD IMAGES - MEJORADO -->
             <div class="form-group full-width image-upload-section">
               <label>📸 Imágenes del Producto</label>
               <div class="image-upload-area" id="imageUploadArea">
@@ -384,7 +446,7 @@
                   <div class="main-image-preview" id="mainImagePreview"></div>
                 </div>
                 <div class="other-images-section">
-                  <h4>🖼️ Otras Imágenes</h4>
+                  <h4>🖼️ Otras Imágenes (Arrastra aquí para hacer principal)</h4>
                   <div class="images-preview" id="otherImagesPreview"></div>
                 </div>
               </div>
@@ -423,10 +485,11 @@
               </div>
             </div>
 
+            <!-- VARIANTS - MEJORADO CON TOGGLE -->
             <div class="variants-section">
               <div class="variants-toggle" onclick="toggleVariants()">
                 <input type="checkbox" id="enableVariants">
-                <label for="enableVariants">🎨 Habilitar Variantes (Color/Talla)</label>
+                <label for="enableVariants">🎨 Habilitar Variantes (Color/Talla - Opcional para ropa)</label>
               </div>
               
               <div class="variants-content" id="variantsContent">
@@ -489,15 +552,58 @@
                   <div class="status-menu">
                     <div class="order-status pending" onclick="toggleStatusMenu(this)">Pendiente</div>
                     <div class="status-dropdown">
-                      <div class="status-option pending" onclick="cambiarEstadoPedido(this, 'pending', 'Pendiente')">⏳ Pendiente</div>
-                      <div class="status-option processing" onclick="cambiarEstadoPedido(this, 'processing', 'En Proceso')">🔄 En Proceso</div>
-                      <div class="status-option shipped" onclick="cambiarEstadoPedido(this, 'shipped', 'Enviado')">🚚 Enviado</div>
-                      <div class="status-option delivered" onclick="cambiarEstadoPedido(this, 'delivered', 'Entregado')">✅ Entregado</div>
-                      <div class="status-option cancelled" onclick="cambiarEstadoPedido(this, 'cancelled', 'Cancelado')">❌ Cancelado</div>
+                      <div class="status-option pending" onclick="cambiarEstadoPedido(this, 'pending', 'Pendiente')">
+                        ⏳ Pendiente
+                      </div>
+                      <div class="status-option processing" onclick="cambiarEstadoPedido(this, 'processing', 'En Proceso')">
+                        🔄 En Proceso
+                      </div>
+                      <div class="status-option shipped" onclick="cambiarEstadoPedido(this, 'shipped', 'Enviado')">
+                        🚚 Enviado
+                      </div>
+                      <div class="status-option delivered" onclick="cambiarEstadoPedido(this, 'delivered', 'Entregado')">
+                        ✅ Entregado
+                      </div>
+                      <div class="status-option cancelled" onclick="cambiarEstadoPedido(this, 'cancelled', 'Cancelado')">
+                        ❌ Cancelado
+                      </div>
                     </div>
                   </div>
                 </td>
-                <td><button class="btn-edit">👁️ Ver</button></td>
+                <td>
+                  <button class="btn-edit">👁️ Ver</button>
+                </td>
+              </tr>
+              <tr>
+                <td>#ORD-002</td>
+                <td>María García</td>
+                <td>R$ 599.00</td>
+                <td>22/01/2026</td>
+                <td>
+                  <div class="status-menu">
+                    <div class="order-status processing" onclick="toggleStatusMenu(this)">En Proceso</div>
+                    <div class="status-dropdown">
+                      <div class="status-option pending" onclick="cambiarEstadoPedido(this, 'pending', 'Pendiente')">
+                        ⏳ Pendiente
+                      </div>
+                      <div class="status-option processing" onclick="cambiarEstadoPedido(this, 'processing', 'En Proceso')">
+                        🔄 En Proceso
+                      </div>
+                      <div class="status-option shipped" onclick="cambiarEstadoPedido(this, 'shipped', 'Enviado')">
+                        🚚 Enviado
+                      </div>
+                      <div class="status-option delivered" onclick="cambiarEstadoPedido(this, 'delivered', 'Entregado')">
+                        ✅ Entregado
+                      </div>
+                      <div class="status-option cancelled" onclick="cambiarEstadoPedido(this, 'cancelled', 'Cancelado')">
+                        ❌ Cancelado
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <button class="btn-edit">👁️ Ver</button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -531,6 +637,20 @@
                 <td>12</td>
                 <td>R$ 5,499.00</td>
                 <td><span class="customer-segment vip">VIP</span></td>
+              </tr>
+              <tr>
+                <td>María García</td>
+                <td>maria@email.com</td>
+                <td>5</td>
+                <td>R$ 1,299.00</td>
+                <td><span class="customer-segment regular">Regular</span></td>
+              </tr>
+              <tr>
+                <td>Carlos Silva</td>
+                <td>carlos@email.com</td>
+                <td>1</td>
+                <td>R$ 299.00</td>
+                <td><span class="customer-segment new">Nuevo</span></td>
               </tr>
             </tbody>
           </table>
@@ -581,85 +701,9 @@
         <div class="table-container">
           <div class="table-header">
             <h3>🚚 Configuración de Envíos</h3>
-            <button class="btn btn-primary" onclick="mostrarFormZona()">➕ Agregar Zona</button>
+            <button class="btn btn-primary" onclick="agregarZonaEnvio()">➕ Agregar Zona</button>
           </div>
-
-          <div id="form-zona" style="display:none;margin-bottom:20px;">
-            <form id="zonaForm" onsubmit="guardarZona(event)" style="background:#f8f9fa;padding:20px;border-radius:8px;">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Nombre de la Zona *</label>
-                  <input type="text" id="zona_nombre" required placeholder="Ej: Zona Norte">
-                </div>
-                <div class="form-group">
-                  <label>Tarifa de Envío (R$) *</label>
-                  <input type="number" id="zona_tarifa" required placeholder="0.00" step="0.01">
-                </div>
-                <div class="form-group full-width">
-                  <label>Descripción</label>
-                  <input type="text" id="zona_descripcion" placeholder="Ej: Estados de la zona norte">
-                </div>
-              </div>
-              <div style="margin-top:20px;">
-                <button type="submit" class="btn btn-primary">💾 Guardar Zona</button>
-                <button type="button" class="btn btn-secondary" onclick="ocultarFormZona()">❌ Cancelar</button>
-              </div>
-            </form>
-          </div>
-
           <div id="zonas-envio-list"></div>
-        </div>
-      </section>
-
-      <!-- CONFIGURACION -->
-      <section id="configuracion" class="section">
-        <div class="settings-section">
-          <h3>⚙️ Configuración General</h3>
-          <div class="setting-item">
-            <div class="setting-label">
-              <h4>Modo Mantenimiento</h4>
-              <p>Activar página de mantenimiento en la tienda</p>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" id="toggle-mantenimiento" onchange="toggleMantenimiento()">
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="setting-item">
-            <div class="setting-label">
-              <h4>Notificaciones por Email</h4>
-              <p>Recibir emails de nuevos pedidos</p>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="setting-item">
-            <div class="setting-label">
-              <h4>Registro de Clientes</h4>
-              <p>Permitir que nuevos usuarios se registren</p>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" checked>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <h3>🔒 Seguridad</h3>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-primary" onclick="mostrarCambioContrasena()">🔑 Cambiar Mi Contraseña</button>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <h3>💾 Datos</h3>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-secondary" onclick="exportarDatos()">📥 Exportar Datos</button>
-            <button class="btn-delete" onclick="limpiarDatos()">🗑️ Limpiar Todos los Datos</button>
-          </div>
         </div>
       </section>
 
@@ -673,61 +717,57 @@
             </div>
           </div>
 
-          <div id="adminsList"></div>
+          <div id="adminsList">
+            <div class="admin-card">
+              <div class="admin-info">
+                <div class="admin-avatar">D</div>
+                <div class="admin-details">
+                  <div style="font-weight:600;color:#0B1320;">DATA001</div>
+                  <div style="font-size:12px;color:#666;">admin@flashbuy.com</div>
+                  <div style="margin-top:8px;">
+                    <span class="admin-role-badge owner">👑 Owner</span>
+                  </div>
+                </div>
+              </div>
+              <div class="admin-actions">
+                <span style="color:#999;font-size:12px;">No se puede modificar</span>
+              </div>
+            </div>
+
+            <div class="admin-card">
+              <div class="admin-info">
+                <div class="admin-avatar" style="background:#2196F3;">M</div>
+                <div class="admin-details">
+                  <div style="font-weight:600;color:#0B1320;">MOD001</div>
+                  <div style="font-size:12px;color:#666;">moderador@flashbuy.com</div>
+                  <div style="margin-top:8px;">
+                    <div class="status-menu">
+                      <span class="admin-role-badge moderator" onclick="toggleRoleMenu(this)">🛡️ Moderador</span>
+                      <div class="status-dropdown">
+                        <div class="status-option" onclick="cambiarRolAdmin(this, 'moderator', '🛡️ Moderador')">
+                          🛡️ Moderador
+                        </div>
+                        <div class="status-option" onclick="cambiarRolAdmin(this, 'publisher', '📝 Publicador')">
+                          📝 Publicador
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="admin-actions" id="ownerActions">
+                <button class="btn-delete" onclick="eliminarAdmin(this)">🗑️ Eliminar</button>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
+
+  </script>
       </section>
 
     </div>
   </main>
-
-  <!-- Modal Cambio de Contraseña -->
-  <div class="modal-overlay" id="modalCambioContrasena">
-    <div class="modal">
-      <button class="modal-close" onclick="cerrarModalContrasena()">×</button>
-      <h2>🔑 Cambiar Contraseña</h2>
-      <form onsubmit="cambiarContrasena(event)">
-        <div class="form-group">
-          <label>Contraseña Actual *</label>
-          <input type="password" id="passwordActual" required>
-        </div>
-        <div class="form-group">
-          <label>Nueva Contraseña *</label>
-          <input type="password" id="passwordNueva" required minlength="6">
-        </div>
-        <div class="form-group">
-          <label>Confirmar Nueva Contraseña *</label>
-          <input type="password" id="passwordConfirmar" required minlength="6">
-        </div>
-        <div style="margin-top:20px;display:flex;gap:10px;">
-          <button type="submit" class="btn btn-primary">✓ Cambiar Contraseña</button>
-          <button type="button" class="btn btn-secondary" onclick="cerrarModalContrasena()">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Cambiar Contraseña de Otro Admin -->
-  <div class="modal-overlay" id="modalCambiarPasswordAdmin">
-    <div class="modal">
-      <button class="modal-close" onclick="cerrarModalPasswordAdmin()">×</button>
-      <h2>🔑 Cambiar Contraseña de <span id="adminPasswordTarget"></span></h2>
-      <form onsubmit="cambiarPasswordAdmin(event)">
-        <input type="hidden" id="adminPasswordId">
-        <div class="form-group">
-          <label>Nueva Contraseña *</label>
-          <input type="password" id="adminPasswordNueva" required minlength="6">
-        </div>
-        <div class="form-group">
-          <label>Confirmar Nueva Contraseña *</label>
-          <input type="password" id="adminPasswordConfirmar" required minlength="6">
-        </div>
-        <div style="margin-top:20px;display:flex;gap:10px;">
-          <button type="submit" class="btn btn-primary">✓ Cambiar Contraseña</button>
-          <button type="button" class="btn btn-secondary" onclick="cerrarModalPasswordAdmin()">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
 
   <!-- Modal Cambio de Perfil -->
   <div class="modal-overlay" id="modalCambioPerfil">
@@ -735,19 +775,14 @@
       <button class="modal-close" onclick="cerrarModalPerfil()">×</button>
       <h2>👤 Cambiar Perfil de Administrador</h2>
       <div class="profile-selector">
-        <p style="color:#666;margin-bottom:15px;">Ingresa la contraseña del perfil al que deseas cambiar:</p>
-        <div id="profileOptions"></div>
-        <form onsubmit="confirmarCambioPerfil(event)" style="margin-top:20px;">
-          <div class="form-group">
-            <label>Contraseña del Perfil *</label>
-            <input type="password" id="passwordCambioPerfil" required>
-          </div>
-          <input type="hidden" id="perfilSeleccionado">
-          <div style="margin-top:20px;display:flex;gap:10px;">
-            <button type="submit" class="btn btn-primary">✓ Cambiar Perfil</button>
-            <button type="button" class="btn btn-secondary" onclick="cerrarModalPerfil()">Cancelar</button>
-          </div>
-        </form>
+        <p style="color:#666;margin-bottom:15px;">Selecciona el perfil con el que deseas trabajar:</p>
+        <div class="profile-options" id="profileOptions">
+          <!-- Se llenarán dinámicamente -->
+        </div>
+      </div>
+      <div style="margin-top:20px;display:flex;gap:10px;">
+        <button class="btn btn-primary" onclick="confirmarCambioPerfil()">✓ Cambiar Perfil</button>
+        <button class="btn btn-secondary" onclick="cerrarModalPerfil()">Cancelar</button>
       </div>
     </div>
   </div>
@@ -763,16 +798,8 @@
           <input type="text" id="newAdminId" required placeholder="Ej: MOD002">
         </div>
         <div class="form-group">
-          <label>Nombre *</label>
-          <input type="text" id="newAdminName" required placeholder="Nombre del administrador">
-        </div>
-        <div class="form-group">
           <label>Email *</label>
           <input type="email" id="newAdminEmail" required placeholder="admin@ejemplo.com">
-        </div>
-        <div class="form-group">
-          <label>Contraseña *</label>
-          <input type="password" id="newAdminPassword" required minlength="6" placeholder="Mínimo 6 caracteres">
         </div>
         <div class="form-group">
           <label>Rol *</label>
@@ -792,54 +819,35 @@
   <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
 
   <script>
-    // SISTEMA DE AUTENTICACIÓN Y DATOS
-    let productos = JSON.parse(localStorage.getItem('flashbuy_productos')) || [
+    // ============ DATOS SIMULADOS ============
+    let productos = [
       { id: 1, nombre: "iPhone 15 Pro", precio: 1299.99, stock: 15, categoria: "Tecnologia", imagen: "https://via.placeholder.com/300", colores: [], tallas: [] },
-      { id: 2, nombre: "Camiseta Nike", precio: 89.90, stock: 45, categoria: "Ropa", imagen: "https://via.placeholder.com/300", colores: ["Rojo", "Azul"], tallas: ["M", "L", "XL"] }
+      { id: 2, nombre: "Camiseta Nike", precio: 89.90, stock: 45, categoria: "Ropa", imagen: "https://via.placeholder.com/300", colores: ["Rojo", "Azul"], tallas: ["M", "L", "XL"] },
+      { id: 3, nombre: "MacBook Air M2", precio: 1899.00, stock: 8, categoria: "Tecnologia", imagen: "https://via.placeholder.com/300", colores: [], tallas: [] },
+      { id: 4, nombre: "Mochila Deportiva", precio: 129.90, stock: 32, categoria: "Accesorios", imagen: "https://via.placeholder.com/300", colores: ["Negro", "Gris"], tallas: [] },
+      { id: 5, nombre: "Set de Cuchillos", precio: 199.90, stock: 5, categoria: "Utensilios", imagen: "https://via.placeholder.com/300", colores: [], tallas: [] }
     ];
 
-    let cupones = JSON.parse(localStorage.getItem('flashbuy_cupones')) || [];
-    let zonasEnvio = JSON.parse(localStorage.getItem('flashbuy_zonas_envio')) || [];
-    
-    let adminProfiles = JSON.parse(localStorage.getItem('flashbuy_admins')) || [
-      { id: 'DATA001', name: 'DATA001', role: 'owner', email: 'admin@flashbuy.com', password: 'Nose**77' }
-    ];
-
-    let currentProfile = JSON.parse(localStorage.getItem('flashbuy_current_user')) || null;
     let currentEditingId = null;
     let productImages = [];
     let mainImageIndex = 0;
-    let colores = [];
-    let tallas = [];
-    let chartCategorias, chartStock;
+    let currentProfile = { id: 'DATA001', name: 'DATA001', role: 'owner', email: 'admin@flashbuy.com' };
+    let adminProfiles = [
+      { id: 'DATA001', name: 'DATA001', role: 'owner', email: 'admin@flashbuy.com' },
+      { id: 'MOD001', name: 'MOD001', role: 'moderator', email: 'moderador@flashbuy.com' }
+    ];
 
-    // VERIFICAR AUTENTICACIÓN
-    function verificarAutenticacion() {
-      if (!currentProfile) {
-        window.location.href = 'https://pruebaflash.netlify.app/admin-login.html';
-        return false;
-      }
-      return true;
-    }
-
-    // INICIALIZACIÓN
+    // ============ INICIALIZACIÓN ============
     document.addEventListener('DOMContentLoaded', function() {
-      if (!verificarAutenticacion()) return;
-      
       cargarProductos();
       actualizarStats();
       crearGraficos();
       inicializarDragDrop();
       actualizarPerfilActual();
       verificarPermisosAdmin();
-      renderizarAdmins();
-      renderizarCupones();
-      renderizarZonasEnvio();
-      cargarConfiguracion();
-      vincularConWeb();
     });
 
-    // NAVEGACIÓN
+    // ============ NAVEGACIÓN ============
     document.querySelectorAll('.menu-item').forEach(item => {
       item.addEventListener('click', function() {
         const section = this.getAttribute('data-section');
@@ -854,8 +862,6 @@
           'agregar-producto': ['➕ Agregar Producto', 'Crear nuevo producto'],
           'pedidos': ['🛒 Pedidos', 'Gestión de pedidos'],
           'clientes': ['👥 Clientes', 'Gestión de clientes'],
-          'marketing': ['🎯 Marketing', 'Cupones y promociones'],
-          'envios': ['🚚 Envíos', 'Configuración de envíos'],
           'administradores': ['👔 Administradores', 'Gestión de administradores'],
           'configuracion': ['⚙️ Configuración', 'Ajustes de la tienda']
         };
@@ -875,28 +881,7 @@
       document.getElementById('sidebar').classList.toggle('open');
     }
 
-    // GESTIÓN DE IMÁGENES
-    function inicializarDragDrop() {
-      const uploadArea = document.getElementById('imageUploadArea');
-      const fileInput = document.getElementById('imageInput');
-
-      uploadArea.addEventListener('click', () => fileInput.click());
-      
-      uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-      });
-      
-      uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('dragover');
-      });
-      
-      uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-        handleFiles(e.dataTransfer.files);}
-		
-// ============ GESTIÓN DE IMÁGENES - MEJORADO ============
+    // ============ GESTIÓN DE IMÁGENES - MEJORADO ============
     function inicializarDragDrop() {
       const uploadArea = document.getElementById('imageUploadArea');
       const fileInput = document.getElementById('imageInput');
@@ -922,6 +907,8 @@
       fileInput.addEventListener('change', (e) => {
         handleFiles(e.target.files);
       });
+    }
+
     function handleFiles(files) {
       Array.from(files).forEach(file => {
         if (file.type.startsWith('image/')) {
@@ -1584,6 +1571,181 @@
       }
     }
 
+     // MARKETING - CUPONES
+    // ============================================
+    function mostrarFormCupon() {
+      document.getElementById('form-cupon').style.display = 'block';
+    }
+
+    function ocultarFormCupon() {
+      document.getElementById('form-cupon').style.display = 'none';
+      document.getElementById('cuponForm').reset();
+    }
+
+    function guardarCupon(e) {
+      e.preventDefault();
+      
+      const cupon = {
+        id: cupones.length + 1,
+        codigo: document.getElementById('cupon_codigo').value.toUpperCase(),
+        descuento: parseInt(document.getElementById('cupon_descuento').value),
+        expiracion: document.getElementById('cupon_expiracion').value,
+        usos: parseInt(document.getElementById('cupon_usos').value) || 999,
+        usosActuales: 0
+      };
+      
+      cupones.push(cupon);
+      localStorage.setItem('flashbuy_cupones', JSON.stringify(cupones));
+      
+      renderizarCupones();
+      ocultarFormCupon();
+      alert('✅ Cupón creado correctamente');
+    }
+
+    function renderizarCupones() {
+      const container = document.getElementById('cupones-list');
+      container.innerHTML = '';
+      
+      if (cupones.length === 0) {
+        container.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">No hay cupones creados</p>';
+        return;
+      }
+      
+      cupones.forEach(c => {
+        container.innerHTML += `
+          <div class="coupon-card">
+            <div class="coupon-code">${c.codigo}</div>
+            <p><strong>${c.descuento}%</strong> de descuento</p>
+            <p>📅 Válido hasta: ${new Date(c.expiracion).toLocaleDateString('es')}</p>
+            <p>🎫 Usos: ${c.usosActuales} / ${c.usos}</p>
+            <button class="btn-delete" onclick="eliminarCupon(${c.id})" style="margin-top:10px;">🗑️ Eliminar</button>
+          </div>
+        `;
+      });
+    }
+
+    function eliminarCupon(id) {
+      if (!confirm('¿Eliminar este cupón?')) return;
+      cupones = cupones.filter(c => c.id !== id);
+      localStorage.setItem('flashbuy_cupones', JSON.stringify(cupones));
+      renderizarCupones();
+    }
+
+    // ============================================
+    // ENVÍOS
+    // ============================================
+    function renderizarZonasEnvio() {
+      const container = document.getElementById('zonas-envio-list');
+      container.innerHTML = '';
+      
+      zonasEnvio.forEach(z => {
+        container.innerHTML += `
+          <div class="shipping-zone">
+            <h4>${z.nombre}</h4>
+            <div class="shipping-rate">
+              <span>${z.descripcion}</span>
+              <strong>${formatBRL(z.tarifa)}</strong>
+            </div>
+            <button class="btn-edit" onclick="editarZona(${z.id})">✏️ Editar</button>
+            <button class="btn-delete" onclick="eliminarZona(${z.id})">🗑️ Eliminar</button>
+          </div>
+        `;
+      });
+    }
+
+    function agregarZonaEnvio() {
+      const nombre = prompt('Nombre de la zona:');
+      if (!nombre) return;
+      
+      const tarifa = parseFloat(prompt('Tarifa de envío:'));
+      if (isNaN(tarifa)) return;
+      
+      const descripcion = prompt('Descripción:') || '';
+      
+      zonasEnvio.push({
+        id: zonasEnvio.length + 1,
+        nombre,
+        tarifa,
+        descripcion
+      });
+      
+      localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
+      renderizarZonasEnvio();
+    }
+
+    function editarZona(id) {
+      const zona = zonasEnvio.find(z => z.id === id);
+      if (!zona) return;
+      
+      const tarifa = parseFloat(prompt('Nueva tarifa:', zona.tarifa));
+      if (!isNaN(tarifa)) {
+        zona.tarifa = tarifa;
+        localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
+        renderizarZonasEnvio();
+      }
+    }
+
+    function eliminarZona(id) {
+      if (!confirm('¿Eliminar esta zona?')) return;
+      zonasEnvio = zonasEnvio.filter(z => z.id !== id);
+      localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
+      renderizarZonasEnvio();
+    }
+
+    // ============================================
+    // CONFIGURACIÓN
+    // ============================================
+    function cargarConfiguracion() {
+      const mantenimiento = localStorage.getItem('flashbuy_mantenimiento') === 'true';
+      document.getElementById('toggle-mantenimiento').checked = mantenimiento;
+    }
+
+    function toggleMantenimiento() {
+      const activo = document.getElementById('toggle-mantenimiento').checked;
+      localStorage.setItem('flashbuy_mantenimiento', activo);
+      
+      if (activo) {
+        alert('⚠️ Modo mantenimiento ACTIVADO\nLa tienda mostrará una página de mantenimiento.');
+      } else {
+        alert('✅ Modo mantenimiento DESACTIVADO\nLa tienda está operativa.');
+      }
+    }
+
+    function limpiarDatos() {
+      if (!confirm('⚠️ ¿Estás seguro? Esto eliminará TODOS los datos del admin.')) return;
+      if (!confirm('🚨 ÚLTIMA CONFIRMACIÓN: Se perderán productos, pedidos, clientes, cupones y configuración.')) return;
+      
+      localStorage.removeItem('flashbuy_productos');
+      localStorage.removeItem('flashbuy_pedidos');
+      localStorage.removeItem('flashbuy_clientes');
+      localStorage.removeItem('flashbuy_cupones');
+      localStorage.removeItem('flashbuy_zonas_envio');
+      
+      alert('🗑️ Datos eliminados. Recargando página...');
+      location.reload();
+    }
+
+    function exportarDatos() {
+      const datos = {
+        productos,
+        pedidos,
+        clientes,
+        cupones,
+        zonasEnvio,
+        fecha: new Date().toISOString()
+      };
+      
+      const dataStr = JSON.stringify(datos, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `flashbuy-backup-${Date.now()}.json`;
+      link.click();
+      
+      alert('📥 Datos exportados correctamente');
+    }
   </script>
 
 </body>
