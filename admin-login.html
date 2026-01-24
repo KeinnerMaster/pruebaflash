@@ -327,7 +327,7 @@
     window.addEventListener('DOMContentLoaded', function() {
       const session = localStorage.getItem('flashbuy_admin_session');
       if (session) {
-        window.location.href = 'admin-data001.html';
+        window.location.href = 'flash.html';
       }
     });
 
@@ -393,12 +393,14 @@
         localStorage.setItem('flashbuy_admin_session', JSON.stringify(sessionData));
 
         // Redirigir al admin
-        window.location.href = 'admin-data001.html';
+        window.location.href = 'flash.html';
       } catch (err) {
         console.error('Error de login:', err);
         btnLogin.classList.remove('loading');
         btnLogin.disabled = false;
-        grecaptcha.reset()
+        grecaptcha.reset();
+        mostrarError('❌ Error al conectar con el servidor. Intenta de nuevo.');
+      }
     });
 
     function mostrarError(mensaje) {
@@ -409,7 +411,7 @@
       // Ocultar después de 5 segundos
       setTimeout(() => {
         errorMsg.classList.remove('show');
-      }, 5000);
+      }, 4000);
     }
 
     // Prevenir espacios en el usuario
