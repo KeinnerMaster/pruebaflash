@@ -8,16 +8,17 @@
 
     // 1. Asegurar que la sesión sea válida
     const sessionRaw = localStorage.getItem('flashbuy_admin_session');
-    if (!sessionRaw) {
-        console.warn("No hay sesión, redirigiendo...");
+    if (
         window.location.href = 'admin-login.html';
         return;
+    )
     }
 
     const session = JSON.parse(sessionRaw);
 
     // 2. Forzar que el rol sea 'owner' si es DATA001 para desbloquear todo
-    if (session.id === 'DATA001') {
+    if (session.id === 'DATA001'){
+     (session.name === 'DATA001') {
         session.role = 'owner';
         localStorage.setItem('flashbuy_admin_session', JSON.stringify(session));
     }

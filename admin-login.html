@@ -327,7 +327,7 @@
     window.addEventListener('DOMContentLoaded', function() {
       const session = localStorage.getItem('flashbuy_admin_session');
       if (session) {
-        window.location.href = 'flash.html';
+        window.location.href = 'admin-data001.html';
       }
     });
 
@@ -393,8 +393,8 @@
         localStorage.setItem('flashbuy_admin_session', JSON.stringify(sessionData));
 
         // Redirigir al admin
-        window.location.href = 'flash.html';
-      } catch (err) {
+        window.location.href = 'admin-data001.html';
+      } catch (error) {
         console.error('Error de login:', err);
         btnLogin.classList.remove('loading');
         btnLogin.disabled = false;
@@ -411,7 +411,7 @@
       // Ocultar después de 5 segundos
       setTimeout(() => {
         errorMsg.classList.remove('show');
-      }, 4000);
+      }, 5000);
     }
 
     // Prevenir espacios en el usuario
