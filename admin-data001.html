@@ -763,61 +763,6 @@
         </div>
       </section>
 
-        // ============================================
-    // CONFIGURACIÓN NO MODIFICAR (KEINNER)
-    // ============================================
-      <section id="configuracion" class="section">
-    function cargarConfiguracion() {
-      const mantenimiento = localStorage.getItem('flashbuy_mantenimiento') === 'true';
-      document.getElementById('toggle-mantenimiento').checked = mantenimiento;
-    }
-
-    function toggleMantenimiento() {
-      const activo = document.getElementById('toggle-mantenimiento').checked;
-      localStorage.setItem('flashbuy_mantenimiento', activo);
-      
-      if (activo) {
-        alert('⚠️ Modo mantenimiento ACTIVADO\nLa tienda mostrará una página de mantenimiento.');
-      } else {
-        alert('✅ Modo mantenimiento DESACTIVADO\nLa tienda está operativa.');
-      }
-    }
-
-    function limpiarDatos() {
-      if (!confirm('⚠️ ¿Estás seguro? Esto eliminará TODOS los datos del admin.')) return;
-      if (!confirm('🚨 ÚLTIMA CONFIRMACIÓN: Se perderán productos, pedidos, clientes, cupones y configuración.')) return;
-      
-      localStorage.removeItem('flashbuy_productos');
-      localStorage.removeItem('flashbuy_pedidos');
-      localStorage.removeItem('flashbuy_clientes');
-      localStorage.removeItem('flashbuy_cupones');
-      localStorage.removeItem('flashbuy_zonas_envio');
-      
-      alert('🗑️ Datos eliminados. Recargando página...');
-      location.reload();
-    }
-
-    function exportarDatos() {
-      const datos = {
-        productos,
-        pedidos,
-        clientes,
-        cupones,
-        zonasEnvio,
-        fecha: new Date().toISOString()
-      };
-      
-      const dataStr = JSON.stringify(datos, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      const url = URL.createObjectURL(dataBlob);
-      
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `flashbuy-backup-${Date.now()}.json`;
-      link.click();
-      
-      alert('📥 Datos exportados correctamente');
-    }
   </script>
       </section>
 
@@ -1624,6 +1569,182 @@
         alert('👋 Sesión cerrada. Redirigiendo...');
         // Aquí iría la lógica de logout
       }
+    }
+
+     // MARKETING - CUPONES
+    // ============================================
+    function mostrarFormCupon() {
+      document.getElementById('form-cupon').style.display = 'block';
+    }
+
+    function ocultarFormCupon() {
+      document.getElementById('form-cupon').style.display = 'none';
+      document.getElementById('cuponForm').reset();
+    }
+
+    function guardarCupon(e) {
+      e.preventDefault();
+      
+      const cupon = {
+        id: cupones.length + 1,
+        codigo: document.getElementById('cupon_codigo').value.toUpperCase(),
+        descuento: parseInt(document.getElementById('cupon_descuento').value),
+        expiracion: document.getElementById('cupon_expiracion').value,
+        usos: parseInt(document.getElementById('cupon_usos').value) || 999,
+        usosActuales: 0
+      };
+      
+      cupones.push(cupon);
+      localStorage.setItem('flashbuy_cupones', JSON.stringify(cupones));
+      
+      renderizarCupones();
+      ocultarFormCupon();
+      alert('✅ Cupón creado correctamente');
+    }
+
+    function renderizarCupones() {
+      const container = document.getElementById('cupones-list');
+      container.innerHTML = '';
+      
+      if (cupones.length === 0) {
+        container.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">No hay cupones creados</p>';
+        return;
+      }
+      
+      cupones.forEach(c => {
+        container.innerHTML += `
+          <div class="coupon-card">
+            <div class="coupon-code">${c.codigo}</div>
+            <p><strong>${c.descuento}%</strong> de descuento</p>
+            <p>📅 Válido hasta: ${new Date(c.expiracion).toLocaleDateString('es')}</p>
+            <p>🎫 Usos: ${c.usosActuales} / ${c.usos}</p>
+            <button class="btn-delete" onclick="eliminarCupon(${c.id})" style="margin-top:10px;">🗑️ Eliminar</button>
+          </div>
+        `;
+      });
+    }
+
+    function eliminarCupon(id) {
+      if (!confirm('¿Eliminar este cupón?')) return;
+      cupones = cupones.filter(c => c.id !== id);
+      localStorage.setItem('flashbuy_cupones', JSON.stringify(cupones));
+      renderizarCupones();
+    }
+
+    // ============================================
+    // ENVÍOS
+    // ============================================
+    function renderizarZonasEnvio() {
+      const container = document.getElementById('zonas-envio-list');
+      container.innerHTML = '';
+      
+      zonasEnvio.forEach(z => {
+        container.innerHTML += `
+          <div class="shipping-zone">
+            <h4>${z.nombre}</h4>
+            <div class="shipping-rate">
+              <span>${z.descripcion}</span>
+              <strong>${formatBRL(z.tarifa)}</strong>
+            </div>
+            <button class="btn-edit" onclick="editarZona(${z.id})">✏️ Editar</button>
+            <button class="btn-delete" onclick="eliminarZona(${z.id})">🗑️ Eliminar</button>
+          </div>
+        `;
+      });
+    }
+
+    function agregarZonaEnvio() {
+      const nombre = prompt('Nombre de la zona:');
+      if (!nombre) return;
+      
+      const tarifa = parseFloat(prompt('Tarifa de envío:'));
+      if (isNaN(tarifa)) return;
+      
+      const descripcion = prompt('Descripción:') || '';
+      
+      zonasEnvio.push({
+        id: zonasEnvio.length + 1,
+        nombre,
+        tarifa,
+        descripcion
+      });
+      
+      localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
+      renderizarZonasEnvio();
+    }
+
+    function editarZona(id) {
+      const zona = zonasEnvio.find(z => z.id === id);
+      if (!zona) return;
+      
+      const tarifa = parseFloat(prompt('Nueva tarifa:', zona.tarifa));
+      if (!isNaN(tarifa)) {
+        zona.tarifa = tarifa;
+        localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
+        renderizarZonasEnvio();
+      }
+    }
+
+    function eliminarZona(id) {
+      if (!confirm('¿Eliminar esta zona?')) return;
+      zonasEnvio = zonasEnvio.filter(z => z.id !== id);
+      localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
+      renderizarZonasEnvio();
+    }
+
+    // ============================================
+    // CONFIGURACIÓN
+    // ============================================
+    function cargarConfiguracion() {
+      const mantenimiento = localStorage.getItem('flashbuy_mantenimiento') === 'true';
+      document.getElementById('toggle-mantenimiento').checked = mantenimiento;
+    }
+
+    function toggleMantenimiento() {
+      const activo = document.getElementById('toggle-mantenimiento').checked;
+      localStorage.setItem('flashbuy_mantenimiento', activo);
+      
+      if (activo) {
+        alert('⚠️ Modo mantenimiento ACTIVADO\nLa tienda mostrará una página de mantenimiento.');
+      } else {
+        alert('✅ Modo mantenimiento DESACTIVADO\nLa tienda está operativa.');
+      }
+    }
+
+    function limpiarDatos() {
+      if (!confirm('⚠️ ¿Estás seguro? Esto eliminará TODOS los datos del admin.')) return;
+      if (!confirm('🚨 ÚLTIMA CONFIRMACIÓN: Se perderán productos, pedidos, clientes, cupones y configuración.')) return;
+      
+      localStorage.removeItem('flashbuy_productos');
+      localStorage.removeItem('flashbuy_pedidos');
+      localStorage.removeItem('flashbuy_clientes');
+      localStorage.removeItem('flashbuy_cupones');
+      localStorage.removeItem('flashbuy_zonas_envio');
+      
+      alert('🗑️ Datos eliminados. Recargando página...');
+      location.reload();
+    }
+
+    function exportarDatos() {
+      const datos = {
+        productos,
+        pedidos,
+        clientes,
+        cupones,
+        zonasEnvio,
+        fecha: new Date().toISOString()
+      };
+      
+      const dataStr = JSON.stringify(datos, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `flashbuy-backup-${Date.now()}.json`;
+      link.click();
+      
+      alert('📥 Datos exportados correctamente');
     }
   </script>
 
