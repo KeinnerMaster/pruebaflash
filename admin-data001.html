@@ -3,10 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <script>
-    // VERIFICACIÓN DE SESIÓN INMEDIATA
+    // VERIFICACIÓN DE SESIÓN MEJORADA
     (function() {
       const session = localStorage.getItem('flashbuy_admin_session');
-      if (!session && !window.location.href.includes('admin-login.html')) {
+      const isLoginPage = window.location.pathname.endsWith('admin-login.html');
+      
+      if (!session && !isLoginPage) {
+        // Solo redirigir si no hay sesión Y no estamos ya en el login
         window.location.href = 'admin-login.html';
       }
     })();
@@ -886,6 +889,19 @@
 
     // ============ INICIALIZACIÓN ============
     document.addEventListener('DOMContentLoaded', function() {
+      // Cargar perfil desde la sesión si existe
+      const session = localStorage.getItem('flashbuy_admin_session');
+      if (session) {
+        try {
+          const sessionData = JSON.parse(session);
+          if (sessionData && sessionData.id) {
+            currentProfile = sessionData;
+          }
+        } catch (e) {
+          console.error("Error cargando sesión:", e);
+        }
+      }
+
       cargarProductos();
       actualizarStats();
       crearGraficos();
