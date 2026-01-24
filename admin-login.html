@@ -314,10 +314,14 @@
     </div>
   </div>
 
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <script>
-    // Credenciales correctas
-    const ADMIN_USER = 'DATA001';
-    const ADMIN_PASS = 'Nose**77';
+    // Configuración de Supabase
+    const SUPABASE_URL = 'https://wjvhvcwnkawjtreavirm.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indqdmh2Y3dua2F3anRyZWF2aXJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNzA0MTQsImV4cCI6MjA4NDg0NjQxNH0.gKj9eBsXKoJG5PePRZyt-Vm8oQfbYXKOb77biE32nxg';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // Verificar si ya está logueado
     window.addEventListener('DOMContentLoaded', function() {
@@ -328,7 +332,7 @@
     });
 
     // Manejar submit del formulario
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const username = document.getElementById('username').value.trim();
@@ -350,38 +354,53 @@
       btnLogin.classList.add('loading');
       btnLogin.disabled = true;
 
-      // Simular verificación
-      setTimeout(() => {
-        // Obtener lista de administradores desde localStorage
-        const adminProfiles = JSON.parse(localStorage.getItem('flashbuy_admins')) || [
-          { id: 'DATA001', name: 'DATA001', role: 'owner', email: 'admin@flashbuy.com', pass: 'Nose**77' }
-        ];
+      try {
+        // Buscar el usuario en Supabase
+        const { data: admins, error } = await supabase
+          .from('administradores')
+          .select('*')
+          .eq('id', username)
+          .eq('pass', password)
+          .single();
 
-        // Buscar el usuario
-        const user = adminProfiles.find(a => a.id === username && a.pass === password);
-
-        if (user) {
-          // Login exitoso
-          const sessionData = {
-            id: user.id,
-            name: user.name,
-            role: user.role,
-            email: user.email,
-            loginTime: new Date().toISOString()
-          };
-          
-          localStorage.setItem('flashbuy_admin_session', JSON.stringify(sessionData));
-
-          // Redirigir al admin
-          window.location.href = 'admin-data001.html';
-        } else {
+        if (error || !admins) {
           // Credenciales incorrectas
           btnLogin.classList.remove('loading');
           btnLogin.disabled = false;
           grecaptcha.reset();
           mostrarError('❌ Usuario o contraseña incorrectos');
+          return;
         }
-      }, 1000);
+
+        // Verificar si la sesión está activa
+        if (!admins.sesion_activa) {
+          btnLogin.classList.remove('loading');
+          btnLogin.disabled = false;
+          grecaptcha.reset();
+          mostrarError('❌ Tu sesión ha sido desactivada por el administrador');
+          return;
+        }
+
+        // Login exitoso
+        const sessionData = {
+          id: admins.id,
+          name: admins.name,
+          role: admins.role,
+          email: admins.email,
+          loginTime: new Date().toISOString()
+        };
+        
+        localStorage.setItem('flashbuy_admin_session', JSON.stringify(sessionData));
+
+        // Redirigir al admin
+        window.location.href = 'admin-data001.html';
+      } catch (err) {
+        console.error('Error de login:', err);
+        btnLogin.classList.remove('loading');
+        btnLogin.disabled = false;
+        grecaptcha.reset();
+        mostrarError('❌ Error al conectar con el servidor. Intenta de nuevo.');
+      }
     });
 
     function mostrarError(mensaje) {

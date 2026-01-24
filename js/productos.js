@@ -296,37 +296,54 @@ const productosDefault = [
     }
 ];
 
-// Cargar productos: primero intenta desde localStorage, si no existe usa los predeterminados
-function cargarProductosDesdeStorage() {
-    const saved = localStorage.getItem('flashbuy_productos');
-    if (saved) {
-        try {
-            return JSON.parse(saved);
-        } catch (e) {
-            console.error('Error al cargar productos desde localStorage:', e);
-            return productosDefault;
-        }
-    }
-    return productosDefault;
+// ============ CONFIGURACIÓN SUPABASE ============
+const SUPABASE_URL = 'https://wjvhvcwnkawjtreavirm.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indqdmh2Y3dua2F3anRyZWF2aXJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNzA0MTQsImV4cCI6MjA4NDg0NjQxNH0.gKj9eBsXKoJG5PePRZyt-Vm8oQfbYXKOb77biE32nxg';
+
+// Inicializar Supabase client
+let supabase = null;
+if (typeof window.supabase !== 'undefined') {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 }
 
 // Array de productos activo
-let productos = cargarProductosDesdeStorage();
+let productos = [];
 
-// Función para recargar productos (útil si se actualizan desde el admin)
-function recargarProductos() {
-    productos = cargarProductosDesdeStorage();
+// Cargar productos desde Supabase
+async function cargarProductosDesdeSupabase() {
+    if (!supabase) {
+        console.warn('Supabase no está disponible, usando productos predeterminados');
+        productos = productosDefault;
+        return;
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from('productos')
+            .select('*')
+            .order('id', { ascending: true });
+        
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+            productos = data;
+        } else {
+            // Si no hay productos en Supabase, usar los predeterminados
+            productos = productosDefault;
+        }
+    } catch (error) {
+        console.error('Error cargando productos desde Supabase:', error);
+        productos = productosDefault;
+    }
+}
+
+// Función para recargar productos
+async function recargarProductos() {
+    await cargarProductosDesdeSupabase();
     if (typeof renderProducts === 'function') {
         renderProducts();
     }
 }
-
-// Escuchar cambios en localStorage
-window.addEventListener('storage', function(e) {
-    if (e.key === 'flashbuy_productos') {
-        recargarProductos();
-    }
-});
 
 function formatBRL(n) {
     return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -392,8 +409,10 @@ function agregar(id) {
     alert("✓ Producto agregado al carrito: " + p.nombre);
 }
 
-document.addEventListener('DOMContentLoaded', function() { 
-    renderProducts(); 
+document.addEventListener('DOMContentLoaded', async function() {
+    // Cargar productos desde Supabase antes de renderizar
+    await cargarProductosDesdeSupabase();
+    renderProducts();
 });
 
 window.renderProducts = renderProducts;
