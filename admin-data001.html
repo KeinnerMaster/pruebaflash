@@ -730,8 +730,9 @@
         <div class="table-container">
           <div class="table-header">
             <h3>👔 Gestión de Administradores</h3>
-            <div class="table-actions">
+            <div class="table-actions" style="display:flex;gap:10px;">
               <button class="btn btn-primary" onclick="mostrarAgregarAdmin()" id="btnAgregarAdmin" style="display:none;">➕ Agregar Administrador</button>
+              <button class="btn btn-delete" onclick="desloguearTodasLasCuentas()" id="btnDesloguearTodos" style="display:none;background:#dc3545;color:white;">🚪 Cerrar Todas las Sesiones</button>
             </div>
           </div>
 
@@ -875,33 +876,27 @@
 
   <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
 
-  <script>
-    // ============ DATOS SIMULADOS ============
-    let productos = [
-      { id: 1, nombre: "iPhone 15 Pro", precio: 1299.99, stock: 15, categoria: "Tecnologia", imagen: "https://via.placeholder.com/300", colores: [], tallas: [] },
-      { id: 2, nombre: "Camiseta Nike", precio: 89.90, stock: 45, categoria: "Ropa", imagen: "https://via.placeholder.com/300", colores: ["Rojo", "Azul"], tallas: ["M", "L", "XL"] },
-      { id: 3, nombre: "MacBook Air M2", precio: 1899.00, stock: 8, categoria: "Tecnologia", imagen: "https://via.placeholder.com/300", colores: [], tallas: [] },
-      { id: 4, nombre: "Mochila Deportiva", precio: 129.90, stock: 32, categoria: "Accesorios", imagen: "https://via.placeholder.com/300", colores: ["Negro", "Gris"], tallas: [] },
-      { id: 5, nombre: "Set de Cuchillos", precio: 199.90, stock: 5, categoria: "Utensilios", imagen: "https://via.placeholder.com/300", colores: [], tallas: [] }
-    ];
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <script>
+    // ============ CONFIGURACIÓN SUPABASE ============
+    const SUPABASE_URL = 'https://wjvhvcwnkawjtreavirm.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indqdmh2Y3dua2F3anRyZWF2aXJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNzA0MTQsImV4cCI6MjA4NDg0NjQxNH0.gKj9eBsXKoJG5PePRZyt-Vm8oQfbYXKOb77biE32nxg';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // ============ DATOS GLOBALES ============
+    let productos = [];
     let currentEditingId = null;
     let productImages = [];
     let mainImageIndex = 0;
     let currentProfile = { id: 'DATA001', name: 'DATA001', role: 'owner', email: 'admin@flashbuy.com' };
-    let adminProfiles = JSON.parse(localStorage.getItem('flashbuy_admins')) || [
-      { id: 'DATA001', name: 'DATA001', role: 'owner', email: 'admin@flashbuy.com', pass: 'Nose**77' },
-      { id: 'MOD001', name: 'MOD001', role: 'moderator', email: 'moderador@flashbuy.com', pass: '123456' }
-    ];
-
-    let cupones = JSON.parse(localStorage.getItem('flashbuy_cupones')) || [];
-    let zonasEnvio = JSON.parse(localStorage.getItem('flashbuy_zonas_envio')) || [
-      { id: 1, nombre: 'Envío Estándar', tarifa: 15.00, descripcion: 'Entrega en 3-5 días hábiles' },
-      { id: 2, nombre: 'Envío Express', tarifa: 35.00, descripcion: 'Entrega en 24-48 horas' }
-    ];
+    let adminProfiles = [];
+    let cupones = [];
+    let zonasEnvio = [];
 
     // ============ INICIALIZACIÓN ============
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
       // Cargar perfil desde la sesión si existe
       const session = localStorage.getItem('flashbuy_admin_session');
       if (session) {
@@ -915,15 +910,82 @@
         }
       }
 
+      // Cargar datos desde Supabase
+      await cargarProductosDesdeSupabase();
+      await cargarAdministradoresDesdeSupabase();
+      await cargarCuponesDesdeSupabase();
+      await cargarZonasEnvioDesdeSupabase();
+
       cargarProductos();
       actualizarStats();
       crearGraficos();
       inicializarDragDrop();
       actualizarPerfilActual();
       verificarPermisosAdmin();
-      renderAdmins(); // Inicializar lista de admins
-      cargarConfiguracion(); // Inicializar configuración
+      renderAdmins();
+      cargarConfiguracion();
     });
+
+    // ============ FUNCIONES DE CARGA DESDE SUPABASE ============
+    async function cargarProductosDesdeSupabase() {
+      try {
+        const { data, error } = await supabase
+          .from('productos')
+          .select('*')
+          .order('id', { ascending: true });
+        
+        if (error) throw error;
+        productos = data || [];
+      } catch (error) {
+        console.error('Error cargando productos:', error);
+        productos = [];
+      }
+    }
+
+    async function cargarAdministradoresDesdeSupabase() {
+      try {
+        const { data, error } = await supabase
+          .from('administradores')
+          .select('*')
+          .order('id', { ascending: true });
+        
+        if (error) throw error;
+        adminProfiles = data || [];
+      } catch (error) {
+        console.error('Error cargando administradores:', error);
+        adminProfiles = [];
+      }
+    }
+
+    async function cargarCuponesDesdeSupabase() {
+      try {
+        const { data, error } = await supabase
+          .from('cupones')
+          .select('*')
+          .order('id', { ascending: true });
+        
+        if (error) throw error;
+        cupones = data || [];
+      } catch (error) {
+        console.error('Error cargando cupones:', error);
+        cupones = [];
+      }
+    }
+
+    async function cargarZonasEnvioDesdeSupabase() {
+      try {
+        const { data, error } = await supabase
+          .from('zonas_envio')
+          .select('*')
+          .order('id', { ascending: true });
+        
+        if (error) throw error;
+        zonasEnvio = data || [];
+      } catch (error) {
+        console.error('Error cargando zonas de envío:', error);
+        zonasEnvio = [];
+      }
+    }
 
     // ============ NAVEGACIÓN ============
     document.querySelectorAll('.menu-item').forEach(item => {
@@ -1269,7 +1331,7 @@
       cancelarEdicion();
     }
 
-    function guardarProducto(e) {
+    async function guardarProducto(e) {
       e.preventDefault();
       
       const producto = {
@@ -1279,26 +1341,43 @@
         stock: parseInt(document.getElementById('stock').value),
         descripcion: document.getElementById('descripcion').value,
         imagen: productImages.length > 0 ? productImages[mainImageIndex] : 'https://via.placeholder.com/300',
-        colores: [...colores],
-        tallas: [...tallas]
+        imagenes: productImages,
+        colores: colores,
+        tallas: tallas
       };
       
-      if (currentEditingId) {
-        const index = productos.findIndex(p => p.id === currentEditingId);
-        productos[index] = { ...producto, id: currentEditingId };
-        alert('✅ Producto actualizado correctamente');
-      } else {
-        producto.id = productos.length > 0 ? Math.max(...productos.map(p => p.id)) + 1 : 1;
-        productos.push(producto);
-        alert('✅ Producto agregado correctamente');
+      try {
+        if (currentEditingId) {
+          // Actualizar producto existente
+          const { error } = await supabase
+            .from('productos')
+            .update(producto)
+            .eq('id', currentEditingId);
+          
+          if (error) throw error;
+          alert('✅ Producto actualizado correctamente');
+        } else {
+          // Crear nuevo producto
+          const { error } = await supabase
+            .from('productos')
+            .insert([producto]);
+          
+          if (error) throw error;
+          alert('✅ Producto agregado correctamente');
+        }
+        
+        // Recargar productos desde Supabase
+        await cargarProductosDesdeSupabase();
+        cargarProductos();
+        actualizarStats();
+        crearGraficos();
+        cancelarEdicion();
+        
+        document.querySelector('[data-section="productos"]').click();
+      } catch (error) {
+        console.error('Error guardando producto:', error);
+        alert('❌ Error al guardar el producto. Intenta de nuevo.');
       }
-      
-      cargarProductos();
-      actualizarStats();
-      crearGraficos();
-      cancelarEdicion();
-      
-      document.querySelector('[data-section="productos"]').click();
     }
 
     function editarProducto(id) {
@@ -1334,13 +1413,25 @@
       document.getElementById('pageSubtitle').textContent = 'Modificar producto existente';
     }
 
-    function eliminarProducto(id) {
+    async function eliminarProducto(id) {
       if (confirm('¿Estás seguro de eliminar este producto?')) {
-        productos = productos.filter(p => p.id !== id);
-        cargarProductos();
-        actualizarStats();
-        crearGraficos();
-        alert('✅ Producto eliminado correctamente');
+        try {
+          const { error } = await supabase
+            .from('productos')
+            .delete()
+            .eq('id', id);
+          
+          if (error) throw error;
+          
+          await cargarProductosDesdeSupabase();
+          cargarProductos();
+          actualizarStats();
+          crearGraficos();
+          alert('✅ Producto eliminado correctamente');
+        } catch (error) {
+          console.error('Error eliminando producto:', error);
+          alert('❌ Error al eliminar el producto.');
+        }
       }
     }
 
@@ -1464,13 +1555,16 @@
     function verificarPermisosAdmin() {
       const menuAdmin = document.querySelector('[data-section="administradores"]');
       const btnAgregarAdmin = document.getElementById('btnAgregarAdmin');
+      const btnDesloguearTodos = document.getElementById('btnDesloguearTodos');
       
       if (currentProfile.role === 'owner') {
         if (menuAdmin) menuAdmin.style.display = 'flex';
         if (btnAgregarAdmin) btnAgregarAdmin.style.display = 'inline-flex';
+        if (btnDesloguearTodos) btnDesloguearTodos.style.display = 'inline-flex';
       } else {
         if (menuAdmin) menuAdmin.style.display = 'none';
         if (btnAgregarAdmin) btnAgregarAdmin.style.display = 'none';
+        if (btnDesloguearTodos) btnDesloguearTodos.style.display = 'none';
         
         // Si está en la sección de administradores y no es owner, redirigir al dashboard
         const activeSection = document.querySelector('.section.active');
@@ -1478,7 +1572,7 @@
           document.querySelector('[data-section="dashboard"]').click();
         }
       }
-      renderAdmins(); // Re-renderizar para aplicar visibilidad de acciones
+    } renderAdmins(); // Re-renderizar para aplicar visibilidad de acciones
     }
 
     function toggleRoleMenu(element) {
@@ -1503,13 +1597,21 @@
       });
     }
 
-    function cambiarRolAdmin(option, newRole, newText, adminId) {
-      const admin = adminProfiles.find(a => a.id === adminId);
-      if (admin) {
-        admin.role = newRole;
-        localStorage.setItem('flashbuy_admins', JSON.stringify(adminProfiles));
+    async function cambiarRolAdmin(option, newRole, newText, adminId) {
+      try {
+        const { error } = await supabase
+          .from('administradores')
+          .update({ role: newRole })
+          .eq('id', adminId);
+        
+        if (error) throw error;
+        
+        await cargarAdministradoresDesdeSupabase();
         renderAdmins();
         alert(`✅ Rol de ${adminId} actualizado a: ${newText}`);
+      } catch (error) {
+        console.error('Error cambiando rol:', error);
+        alert('❌ Error al cambiar el rol.');
       }
     }
 
@@ -1547,6 +1649,13 @@
                   </div>
                 `}
               </div>
+              ${admin.role !== 'owner' ? `
+                <div style="margin-top:8px;font-size:12px;">
+                  ${admin.sesion_activa ? 
+                    '<span style="color:#4CAF50;font-weight:600;">✅ Sesión Activa</span>' : 
+                    '<span style="color:#dc3545;font-weight:600;">❌ Sesión Desactivada</span> <button onclick="reactivarSesionAdmin(\'${admin.id}\')" style="margin-left:8px;padding:2px 8px;font-size:11px;background:#4CAF50;color:white;border:none;border-radius:4px;cursor:pointer;">↻ Reactivar</button>'}
+                </div>
+              ` : ''}
             </div>
           </div>
           <div class="admin-actions">
@@ -1559,7 +1668,7 @@
       `).join('');
     }
 
-    function agregarNuevoAdmin(e) {
+    async function agregarNuevoAdmin(e) {
       e.preventDefault();
       const id = document.getElementById('newAdminId').value.trim();
       const email = document.getElementById('newAdminEmail').value.trim();
@@ -1571,37 +1680,68 @@
         return;
       }
 
-      adminProfiles.push({ id, name: id, role, email, pass });
-      localStorage.setItem('flashbuy_admins', JSON.stringify(adminProfiles));
-      
-      renderAdmins();
-      cerrarModalAgregarAdmin();
-      alert('✅ Administrador agregado correctamente');
+      try {
+        const { error } = await supabase
+          .from('administradores')
+          .insert([{ id, name: id, role, email, pass, sesion_activa: true }]);
+        
+        if (error) throw error;
+        
+        await cargarAdministradoresDesdeSupabase();
+        renderAdmins();
+        cerrarModalAgregarAdmin();
+        alert('✅ Administrador agregado correctamente');
+      } catch (error) {
+        console.error('Error agregando administrador:', error);
+        alert('❌ Error al agregar el administrador.');
+      }
     }
 
-    function eliminarAdmin(id) {
+    async function eliminarAdmin(id) {
       if (currentProfile.role !== 'owner') {
         alert('❌ Solo el propietario puede eliminar administradores');
         return;
       }
       
       if (confirm(`¿Estás seguro de eliminar al administrador ${id}?`)) {
-        adminProfiles = adminProfiles.filter(a => a.id !== id);
-        localStorage.setItem('flashbuy_admins', JSON.stringify(adminProfiles));
-        renderAdmins();
-        alert('✅ Administrador eliminado correctamente');
+        try {
+          const { error } = await supabase
+            .from('administradores')
+            .delete()
+            .eq('id', id);
+          
+          if (error) throw error;
+          
+          await cargarAdministradoresDesdeSupabase();
+          renderAdmins();
+          alert('✅ Administrador eliminado correctamente');
+        } catch (error) {
+          console.error('Error eliminando administrador:', error);
+          alert('❌ Error al eliminar el administrador.');
+        }
       }
     }
 
-    function editarAdmin(id) {
+    async function editarAdmin(id) {
       const admin = adminProfiles.find(a => a.id === id);
       if (!admin) return;
       
       const newPass = prompt(`Nueva contraseña para ${id} (deja vacío para no cambiar):`);
       if (newPass !== null && newPass.trim() !== "") {
-        admin.pass = newPass;
-        localStorage.setItem('flashbuy_admins', JSON.stringify(adminProfiles));
-        alert('✅ Contraseña actualizada');
+        try {
+          const { error } = await supabase
+            .from('administradores')
+            .update({ pass: newPass })
+            .eq('id', id);
+          
+          if (error) throw error;
+          
+          await cargarAdministradoresDesdeSupabase();
+          alert('✅ Contraseña actualizada');
+        } catch (error) {
+          console.error('Error actualizando contraseña:', error);
+          alert('❌ Error al actualizar la contraseña.');
+        }
       }
     }
 
@@ -1696,6 +1836,64 @@
         });
       }
     });
+
+    // ============ CIERRE DE SESIÓN GLOBAL ============
+    async function desloguearTodasLasCuentas() {
+      if (currentProfile.role !== 'owner') {
+        alert('❌ Solo el propietario puede cerrar todas las sesiones.');
+        return;
+      }
+
+      if (!confirm('⚠️ ¿Estás seguro de cerrar todas las sesiones activas?\n\nEsto deslogueará a todos los administradores, moderadores y publicadores en cualquier computadora.')) {
+        return;
+      }
+
+      if (!confirm('🚨 Última confirmación: Todas las cuentas serán deslogueadas globalmente. ¿Continuar?')) {
+        return;
+      }
+
+      try {
+        // Desactivar sesiones de todos los administradores excepto el owner
+        const { error } = await supabase
+          .from('administradores')
+          .update({ sesion_activa: false })
+          .neq('role', 'owner');
+        
+        if (error) throw error;
+        
+        await cargarAdministradoresDesdeSupabase();
+        renderAdmins();
+        
+        alert('✅ ¡Todas las sesiones han sido cerradas!\n\nTodos los usuarios deberán iniciar sesión nuevamente.');
+      } catch (error) {
+        console.error('Error cerrando sesiones:', error);
+        alert('❌ Error al cerrar las sesiones. Intenta de nuevo.');
+      }
+    }
+
+    // ============ REACTIVAR SESIÓN DE UN ADMIN ============
+    async function reactivarSesionAdmin(adminId) {
+      if (currentProfile.role !== 'owner') {
+        alert('❌ Solo el propietario puede reactivar sesiones.');
+        return;
+      }
+
+      try {
+        const { error } = await supabase
+          .from('administradores')
+          .update({ sesion_activa: true })
+          .eq('id', adminId);
+        
+        if (error) throw error;
+        
+        await cargarAdministradoresDesdeSupabase();
+        renderAdmins();
+        alert(`✅ Sesión de ${adminId} reactivada correctamente.`);
+      } catch (error) {
+        console.error('Error reactivando sesión:', error);
+        alert('❌ Error al reactivar la sesión.');
+      }
+    }
 
     function cerrarSesion() {
       if (confirm('¿Estás seguro de cerrar sesión?')) {
