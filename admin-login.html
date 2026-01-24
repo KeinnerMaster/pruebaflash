@@ -398,9 +398,7 @@
         console.error('Error de login:', err);
         btnLogin.classList.remove('loading');
         btnLogin.disabled = false;
-        grecaptcha.reset();
-        mostrarError('❌ Error al conectar con el servidor. Intenta de nuevo.');
-      }
+        grecaptcha.reset()
     });
 
     function mostrarError(mensaje) {
