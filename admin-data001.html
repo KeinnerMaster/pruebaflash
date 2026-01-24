@@ -320,11 +320,13 @@
           <div class="user-badge" id="userBadge">OWNER</div>
         </div>
       </div>
-     <div class="user-menu-dropdown" id="userMenuDropdown">
-      <div class="user-menu-item" onclick="mostrarCambioPerfil()">🔄 Cambiar Perfil</div>
-      <div id="globalLogoutBtn" class="user-menu-item" onclick="cierreSesionGlobal()" style="color: #FF7A00; display: none;">🌐 Cierre Global</div>
-      <div class="user-menu-item" onclick="cerrarSesion()" style="color: #dc3545;">🚪 Cerrar Sesión</div>
-    </div>    </div>
+      <div class="user-menu-dropdown" id="userMenuDropdown">
+        <div class="user-menu-item" onclick="mostrarCambioPerfil()">
+          👤 Cambiar Perfil
+        </div>
+        <div class="user-menu-item" onclick="cerrarSesion()">
+          🚪 Cerrar Sesión
+        </div>
       </div>
     </div>
   </aside>
@@ -809,9 +811,7 @@
               <h4>💾 Gestión de Datos</h4>
               <p style="font-size: 14px; color: #666; margin: 10px 0 20px 0;">Exporta tus datos o limpia la base de datos local.</p>
               <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn btn-primary" onclick="exportarDatos()">📥 Exportar Backup</button>
-                <button class="btn btn-secondary" onclick="document.getElementById('importInput').click()">📤 Importar/Sincronizar</button>
-                <input type="file" id="importInput" style="display:none" onchange="importarDatos(event)" accept=".json">
+                <button class="btn btn-primary" onclick="exportarDatos()">📥 Exportar JSON</button>
                 <button class="btn btn-delete" onclick="limpiarDatos()" style="background: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">🗑️ Limpiar Todo</button>
               </div>
             </div>
@@ -1679,23 +1679,6 @@
       const badgeText = currentProfile.role === 'owner' ? 'OWNER' : 
                        currentProfile.role === 'moderator' ? 'MODERATOR' : 'PUBLISHER';
       document.getElementById('userBadge').textContent = badgeText;
-      
-      // Mostrar botón de cierre global solo al Owner
-      const globalBtn = document.getElementById('globalLogoutBtn');
-      if (globalBtn) {
-        globalBtn.style.display = currentProfile.role === 'owner' ? 'flex' : 'none';
-      }
-    }
-
-    function cierreSesionGlobal() {
-      if (currentProfile.role !== 'owner') return;
-      if (confirm('⚠️ ¿Deseas cerrar todas las sesiones? \nEsto invalidará el acceso actual en este navegador y requerirá re-login.')) {
-        // En un sistema real esto enviaría una señal al servidor.
-        // Aquí simulamos invalidando la sesión local y limpiando tokens.
-        localStorage.removeItem('flashbuy_admin_session');
-        alert('✅ Sesiones globales invalidadas. Redirigiendo...');
-        window.location.href = 'admin-login.html';
-      }
     }
 
     // ============ MENÚ DE USUARIO ============
@@ -1880,58 +1863,23 @@
       location.reload();
     }
 
-     function exportarDatos() {
+    function exportarDatos() {
       const datos = {
-        productos: productos,
-        cupones: cupones,
-        zonasEnvio: zonasEnvio,
-        admins: adminProfiles,
-        config: {
-          mantenimiento: localStorage.getItem('flashbuy_mantenimiento'),
-          notificaciones: localStorage.getItem('flashbuy_notificaciones')
-        },
+        productos,
+        pedidos,
+        clientes,
+        cupones,
+        zonasEnvio,
         fecha: new Date().toISOString()
       };
       
-      const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `flashbuy-full-backup-${new Date().toLocaleDateString()}.json`;
-      a.click();
-      alert('✅ Backup completo generado. Puedes usar este archivo para sincronizar otros dispositivos.');
-    }
-
-    function importarDatos(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+      const dataStr = JSON.stringify(datos, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
       
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const datos = JSON.parse(e.target.result);
-          if (confirm('⚠️ ¿Deseas importar estos datos? Se sobrescribirá la configuración actual.')) {
-            if (datos.productos) productos = datos.productos;
-            if (datos.cupones) cupones = datos.cupones;
-            if (datos.zonasEnvio) zonasEnvio = datos.zonasEnvio;
-            if (datos.admins) {
-              adminProfiles = datos.admins;
-              localStorage.setItem('flashbuy_admins', JSON.stringify(adminProfiles));
-            }
-            if (datos.config) {
-              localStorage.setItem('flashbuy_mantenimiento', datos.config.mantenimiento);
-              localStorage.setItem('flashbuy_notificaciones', datos.config.notificaciones);
-            }
-            
-            alert('✅ Datos importados y sincronizados correctamente.');
-            location.reload();
-          }
-        } catch (err) {
-          alert('❌ Error al procesar el archivo de backup.');
-        }
-      };
-      reader.readAsText(file);
-    }now()}.json`;
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `flashbuy-backup-${Date.now()}.json`;
       link.click();
       
       alert('📥 Datos exportados correctamente');
