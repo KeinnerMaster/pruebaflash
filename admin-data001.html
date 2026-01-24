@@ -2004,7 +2004,7 @@
           <div class="shipping-zone">
             <h4>${z.nombre}</h4>
             <div class="shipping-rate">
-              <span>${z.descripcion}</span>
+              <span>${z.deetallesenvio}</span>
               <strong>${formatBRL(z.tarifa)}</strong>
             </div>
             <button class="btn-edit" onclick="editarZona(${z.id})">✏️ Editar</button>
@@ -2021,13 +2021,13 @@
       const tarifa = parseFloat(prompt('Tarifa de envío:'));
       if (isNaN(tarifa)) return;
       
-      const descripcion = prompt('Descripción:') || '';
+      const deetallesenvio = prompt('Descripción:') || '';
       
       zonasEnvio.push({
         id: zonasEnvio.length + 1,
         nombre,
         tarifa,
-        descripcion
+        deetallesenvio
       });
       
       localStorage.setItem('flashbuy_zonas_envio', JSON.stringify(zonasEnvio));
