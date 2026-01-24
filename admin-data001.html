@@ -6,6 +6,7 @@
   <title>Admin Dashboard - FlashBuy</title>
   <script defer src="https://cloud.umami.is/script.js" data-website-id="f974dcbb-29aa-4518-89ec-ab9e4abce31d"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Segoe UI', sans-serif; background: #f5f7fa; display: flex; height: 100vh; overflow: hidden; }
@@ -921,8 +922,6 @@
       fileInput.addEventListener('change', (e) => {
         handleFiles(e.target.files);
       });
-    }
-
     function handleFiles(files) {
       Array.from(files).forEach(file => {
         if (file.type.startsWith('image/')) {
