@@ -350,16 +350,23 @@
       btnLogin.classList.add('loading');
       btnLogin.disabled = true;
 
-      // Simular verificación (en producción esto sería una llamada al servidor)
+      // Simular verificación
       setTimeout(() => {
-        // Verificar credenciales
-        if (username === ADMIN_USER && password === ADMIN_PASS) {
+        // Obtener lista de administradores desde localStorage
+        const adminProfiles = JSON.parse(localStorage.getItem('flashbuy_admins')) || [
+          { id: 'DATA001', name: 'DATA001', role: 'owner', email: 'admin@flashbuy.com', pass: 'Nose**77' }
+        ];
+
+        // Buscar el usuario
+        const user = adminProfiles.find(a => a.id === username && a.pass === password);
+
+        if (user) {
           // Login exitoso
           const sessionData = {
-            id: 'DATA001',
-            name: 'DATA001',
-            role: 'owner',
-            email: 'admin@flashbuy.com',
+            id: user.id,
+            name: user.name,
+            role: user.role,
+            email: user.email,
             loginTime: new Date().toISOString()
           };
           
