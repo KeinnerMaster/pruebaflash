@@ -304,7 +304,7 @@
       <a class="menu-item" data-section="envios">
         <span class="menu-item-icon">🚚</span><span>Envíos</span>
       </a>
-      <a class="menu-item" data-section="administradores" id="menu-admin" style="display:none;">
+      <a class="menu-item" data-section="administradores" style="display:none;">
         <span class="menu-item-icon">👔</span><span>Administradores</span>
       </a>
       <a class="menu-item" data-section="configuracion">
@@ -1480,15 +1480,23 @@
 
     // ============ ADMINISTRADORES ============
     function verificarPermisosAdmin() {
+      const menuAdmin = document.querySelector('[data-section="administradores"]');
+      const btnAgregarAdmin = document.getElementById('btnAgregarAdmin');
+      
       if (currentProfile.role === 'owner') {
-        document.getElementById('menu-admin').style.display = 'flex';
-        document.getElementById('btnAgregarAdmin').style.display = 'inline-flex';
-        document.querySelectorAll('#ownerActions').forEach(el => el.style.display = 'flex');
+        if (menuAdmin) menuAdmin.style.display = 'flex';
+        if (btnAgregarAdmin) btnAgregarAdmin.style.display = 'inline-flex';
       } else {
-        document.getElementById('menu-admin').style.display = 'none';
-        document.getElementById('btnAgregarAdmin').style.display = 'none';
-        document.querySelectorAll('#ownerActions').forEach(el => el.style.display = 'none');
+        if (menuAdmin) menuAdmin.style.display = 'none';
+        if (btnAgregarAdmin) btnAgregarAdmin.style.display = 'none';
+        
+        // Si está en la sección de administradores y no es owner, redirigir al dashboard
+        const activeSection = document.querySelector('.section.active');
+        if (activeSection && activeSection.id === 'administradores') {
+          document.querySelector('[data-section="dashboard"]').click();
+        }
       }
+      renderAdmins(); // Re-renderizar para aplicar visibilidad de acciones
     }
 
     function toggleRoleMenu(element) {
@@ -1513,15 +1521,14 @@
       });
     }
 
-    function cambiarRolAdmin(option, newRole, newText) {
-      const badge = option.closest('.status-menu').querySelector('.admin-role-badge');
-      badge.className = `admin-role-badge ${newRole}`;
-      badge.textContent = newText;
-      
-      const dropdown = option.closest('.status-dropdown');
-      dropdown.classList.remove('active');
-      
-      alert(`✅ Rol actualizado a: ${newText}`);
+    function cambiarRolAdmin(option, newRole, newText, adminId) {
+      const admin = adminProfiles.find(a => a.id === adminId);
+      if (admin) {
+        admin.role = newRole;
+        localStorage.setItem('flashbuy_admins', JSON.stringify(adminProfiles));
+        renderAdmins();
+        alert(`✅ Rol de ${adminId} actualizado a: ${newText}`);
+      }
     }
 
     function mostrarAgregarAdmin() {
@@ -1533,7 +1540,10 @@
       document.getElementById('newAdminId').value = '';
       document.getElementById('newAdminEmail').value = '';
       document.getElementById('newAdminRole').value = 'moderator';
-      function renderAdmins() {
+      if(document.getElementById('newAdminPass')) document.getElementById('newAdminPass').value = '';
+    }
+
+    function renderAdmins() {
       const adminsList = document.getElementById('adminsList');
       const roleTexts = { 'owner': '👑 Owner', 'moderator': '🛡️ Moderador', 'publisher': '📝 Publicador' };
       
@@ -1610,16 +1620,6 @@
         admin.pass = newPass;
         localStorage.setItem('flashbuy_admins', JSON.stringify(adminProfiles));
         alert('✅ Contraseña actualizada');
-      }
-    }    function eliminarAdmin(button) {
-      if (currentProfile.role !== 'owner') {
-        alert('❌ Solo el propietario puede eliminar administradores');
-        return;
-      }
-      
-      if (confirm('¿Estás seguro de eliminar este administrador?')) {
-        button.closest('.admin-card').remove();
-        alert('✅ Administrador eliminado correctamente');
       }
     }
 
