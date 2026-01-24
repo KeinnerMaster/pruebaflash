@@ -788,49 +788,31 @@
             <h3>⚙️ Configuración del Sistema</h3>
           </div>
           
-          <div class="settings-grid" style="display: flex; flex-direction: column; gap: 20px; margin-top: 20px;">
-            <div class="settings-card" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-              <h4 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">⚙️ Configuración General</h4>
-              
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f0f0f0;">
-                <div>
-                  <div style="font-weight: 600; color: #0B1320;">Modo Mantenimiento</div>
-                  <div style="font-size: 13px; color: #666;">Activar página de mantenimiento en la tienda</div>
-                </div>
-                <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 26px;">
-                  <input type="checkbox" id="toggle-mantenimiento" onchange="toggleSetting('mantenimiento')" style="opacity: 0; width: 0; height: 0;">
-                  <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
-                </label>
-              </div>
-
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f0f0f0;">
-                <div>
-                  <div style="font-weight: 600; color: #0B1320;">Notificaciones por Email</div>
-                  <div style="font-size: 13px; color: #666;">Recibir emails de nuevos pedidos</div>
-                </div>
-                <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 26px;">
-                  <input type="checkbox" id="toggle-notificaciones" onchange="toggleSetting('notificaciones')" style="opacity: 0; width: 0; height: 0;">
-                  <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
-                </label>
-              </div>
-
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0;">
-                <div>
-                  <div style="font-weight: 600; color: #0B1320;">Registro de Clientes</div>
-                  <div style="font-size: 13px; color: #666;">Permitir que nuevos usuarios se registren</div>
-                </div>
-                <label class="switch" style="position: relative; display: inline-block; width: 50px; height: 26px;">
-                  <input type="checkbox" id="toggle-registro" onchange="toggleSetting('registro')" style="opacity: 0; width: 0; height: 0;">
-                  <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
-                </label>
-              </div>
+          <div class="settings-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+            <div class="settings-card" style="background: #f8f9fa; padding: 20px; border-radius: 12px; border: 1px solid #e0e0e0;">
+              <h4>🛠️ Modo Mantenimiento</h4>
+              <p style="font-size: 14px; color: #666; margin: 10px 0 20px 0;">Activa esta opción para mostrar una página de mantenimiento a los clientes.</p>
+              <label class="switch" style="position: relative; display: inline-block; width: 60px; height: 34px;">
+                <input type="checkbox" id="toggle-mantenimiento" onchange="toggleMantenimiento()" style="opacity: 0; width: 0; height: 0;">
+                <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
+              </label>
             </div>
 
-            <div class="settings-card" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-              <h4 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">🔐 Seguridad y Datos</h4>
-              <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                <button class="btn btn-delete" onclick="limpiarDatos()" style="background: #f8f9fa; color: #333; border: 1px solid #ddd; padding: 12px 20px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600;">🗑️ Limpiar Todos los Datos</button>
-                <button class="btn btn-primary" onclick="exportarDatos()" style="background: #FF7A00; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600;">📥 Exportar Datos</button>
+            <div class="settings-card" style="background: #f8f9fa; padding: 20px; border-radius: 12px; border: 1px solid #e0e0e0;">
+              <h4>🔔 Notificaciones por Email</h4>
+              <p style="font-size: 14px; color: #666; margin: 10px 0 20px 0;">Recibir alertas por correo electrónico cuando se realice un nuevo pedido.</p>
+              <label class="switch" style="position: relative; display: inline-block; width: 60px; height: 34px;">
+                <input type="checkbox" id="toggle-notificaciones" onchange="toggleNotificaciones()" style="opacity: 0; width: 0; height: 0;">
+                <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px;"></span>
+              </label>
+            </div>
+
+            <div class="settings-card" style="background: #f8f9fa; padding: 20px; border-radius: 12px; border: 1px solid #e0e0e0;">
+              <h4>💾 Gestión de Datos</h4>
+              <p style="font-size: 14px; color: #666; margin: 10px 0 20px 0;">Exporta tus datos o limpia la base de datos local.</p>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="exportarDatos()">📥 Exportar JSON</button>
+                <button class="btn btn-delete" onclick="limpiarDatos()" style="background: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer;">🗑️ Limpiar Todo</button>
               </div>
             </div>
           </div>
@@ -1663,11 +1645,24 @@
         const profile = adminProfiles.find(p => p.id === profileId);
         
         if (profile) {
-          currentProfile = profile;
-          actualizarPerfilActual();
-          verificarPermisosAdmin();
-          cerrarModalPerfil();
-          alert(`✅ Perfil cambiado a: ${profile.name}`);
+          // Solicitar contraseña para el nuevo perfil
+          const password = prompt(`Introduce la contraseña para el perfil ${profile.id}:`);
+          
+          if (password === profile.pass) {
+            currentProfile = profile;
+            // Actualizar también la sesión en localStorage
+            localStorage.setItem('flashbuy_admin_session', JSON.stringify(profile));
+            
+            actualizarPerfilActual();
+            verificarPermisosAdmin();
+            cerrarModalPerfil();
+            alert(`✅ Perfil cambiado correctamente a: ${profile.name}`);
+            
+            // Redirigir al dashboard para limpiar estados anteriores
+            document.querySelector('[data-section="dashboard"]').click();
+          } else {
+            alert('❌ Contraseña incorrecta. No se pudo cambiar el perfil.');
+          }
         }
       }
     }
@@ -1835,36 +1830,23 @@
     // CONFIGURACIÓN
     // ============================================
     function cargarConfiguracion() {
-      const config = JSON.parse(localStorage.getItem('flashbuy_config')) || {
-        mantenimiento: false,
-        notificaciones: true,
-        registro: true
-      };
+      const mantenimiento = localStorage.getItem('flashbuy_mantenimiento') === 'true';
+      const notificaciones = localStorage.getItem('flashbuy_notificaciones') !== 'false'; // Default true
       
-      document.getElementById('toggle-mantenimiento').checked = config.mantenimiento;
-      document.getElementById('toggle-notificaciones').checked = config.notificaciones;
-      document.getElementById('toggle-registro').checked = config.registro;
+      document.getElementById('toggle-mantenimiento').checked = mantenimiento;
+      document.getElementById('toggle-notificaciones').checked = notificaciones;
     }
 
-    function toggleSetting(key) {
-      const config = JSON.parse(localStorage.getItem('flashbuy_config')) || {
-        mantenimiento: false,
-        notificaciones: true,
-        registro: true
-      };
-      
-      const elementId = `toggle-${key === 'mantenimiento' ? 'mantenimiento' : key === 'notificaciones' ? 'notificaciones' : 'registro'}`;
-      config[key] = document.getElementById(elementId).checked;
-      
-      localStorage.setItem('flashbuy_config', JSON.stringify(config));
-      
-      const messages = {
-        mantenimiento: config.mantenimiento ? '⚠️ Modo mantenimiento ACTIVADO' : '✅ Modo mantenimiento DESACTIVADO',
-        notificaciones: config.notificaciones ? '🔔 Notificaciones por email ACTIVADAS' : '🔕 Notificaciones por email DESACTIVADAS',
-        registro: config.registro ? '👥 Registro de clientes PERMITIDO' : '🚫 Registro de clientes DESACTIVADO'
-      };
-      
-      alert(messages[key]);
+    function toggleMantenimiento() {
+      const activo = document.getElementById('toggle-mantenimiento').checked;
+      localStorage.setItem('flashbuy_mantenimiento', activo);
+      alert(activo ? '⚠️ Modo mantenimiento ACTIVADO' : '✅ Modo mantenimiento DESACTIVADO');
+    }
+
+    function toggleNotificaciones() {
+      const activo = document.getElementById('toggle-notificaciones').checked;
+      localStorage.setItem('flashbuy_notificaciones', activo);
+      alert(activo ? '🔔 Notificaciones por email ACTIVADAS' : '🔕 Notificaciones por email DESACTIVADAS');
     }
 
     function limpiarDatos() {
