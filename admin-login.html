@@ -321,8 +321,8 @@
 
     // Verificar si ya está logueado
     window.addEventListener('DOMContentLoaded', function() {
-      const isLoggedIn = sessionStorage.getItem('flashbuy_admin_logged');
-      if (isLoggedIn === 'true') {
+      const session = localStorage.getItem('flashbuy_admin_session');
+      if (session) {
         window.location.href = 'admin-data001.html';
       }
     });
@@ -355,9 +355,15 @@
         // Verificar credenciales
         if (username === ADMIN_USER && password === ADMIN_PASS) {
           // Login exitoso
-          sessionStorage.setItem('flashbuy_admin_logged', 'true');
-          sessionStorage.setItem('flashbuy_admin_user', username);
-          sessionStorage.setItem('flashbuy_admin_time', new Date().toISOString());
+          const sessionData = {
+            id: 'DATA001',
+            name: 'DATA001',
+            role: 'owner',
+            email: 'admin@flashbuy.com',
+            loginTime: new Date().toISOString()
+          };
+          
+          localStorage.setItem('flashbuy_admin_session', JSON.stringify(sessionData));
 
           // Redirigir al admin
           window.location.href = 'admin-data001.html';
