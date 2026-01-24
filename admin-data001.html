@@ -3,14 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <script>
-    // VERIFICACIÓN DE SESIÓN MEJORADA
+    // VERIFICACIÓN DE SESIÓN INMEDIATA
     (function() {
       const session = localStorage.getItem('flashbuy_admin_session');
-      const isLoginPage = window.location.pathname.endsWith('admin-login.html');
-      
-      if (!session && !isLoginPage) {
-        // Solo redirigir si no hay sesión Y no estamos ya en el login
-        window.location.href = 'admin-login.html';
+      if (!session) {
+        window.location.replace('admin-login.html');
       }
     })();
   </script>
@@ -304,7 +301,7 @@
       <a class="menu-item" data-section="envios">
         <span class="menu-item-icon">🚚</span><span>Envíos</span>
       </a>
-      <a class="menu-item" data-section="administradores" style="display:none;">
+      <a class="menu-item" data-section="administradores" id="menuItemAdmins">
         <span class="menu-item-icon">👔</span><span>Administradores</span>
       </a>
       <a class="menu-item" data-section="configuracion">
@@ -897,6 +894,8 @@
 
     // ============ INICIALIZACIÓN ============
     document.addEventListener('DOMContentLoaded', async function() {
+      console.log("Inicializando Dashboard...");
+      
       // Cargar perfil desde la sesión si existe
       const session = localStorage.getItem('flashbuy_admin_session');
       if (session) {
@@ -904,6 +903,7 @@
           const sessionData = JSON.parse(session);
           if (sessionData && sessionData.id) {
             currentProfile = sessionData;
+            console.log("Sesión cargada para:", currentProfile.id);
           }
         } catch (e) {
           console.error("Error cargando sesión:", e);
@@ -911,19 +911,30 @@
       }
 
       // Cargar datos desde Supabase
-      await cargarProductosDesdeSupabase();
-      await cargarAdministradoresDesdeSupabase();
-      await cargarCuponesDesdeSupabase();
-      await cargarZonasEnvioDesdeSupabase();
+      try {
+        await Promise.all([
+          cargarProductosDesdeSupabase(),
+          cargarAdministradoresDesdeSupabase(),
+          cargarCuponesDesdeSupabase(),
+          cargarZonasEnvioDesdeSupabase()
+        ]);
+        console.log("Datos cargados desde Supabase");
+      } catch (err) {
+        console.error("Error en carga inicial:", err);
+      }
 
+      // Renderizar y configurar
+      actualizarPerfilActual();
+      verificarPermisosAdmin();
+      
       cargarProductos();
       actualizarStats();
       crearGraficos();
       inicializarDragDrop();
-      actualizarPerfilActual();
-      verificarPermisosAdmin();
       renderAdmins();
       cargarConfiguracion();
+      
+      console.log("Dashboard listo.");
     });
 
     // ============ FUNCIONES DE CARGA DESDE SUPABASE ============
@@ -988,44 +999,56 @@
     }
 
     // ============ NAVEGACIÓN ============
-    document.querySelectorAll('.menu-item').forEach(item => {
-      item.addEventListener('click', function() {
-        const section = this.getAttribute('data-section');
-        document.querySelectorAll('.menu-item').forEach(mi => mi.classList.remove('active'));
-        this.classList.add('active');
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        const targetSection = document.getElementById(section);
-        if (targetSection) {
-          targetSection.classList.add('active');
-          document.getElementById('pageTitle').textContent = this.querySelector('span:last-child').textContent;
-          document.getElementById('pageSubtitle').textContent = `Gestión de ${this.querySelector('span:last-child').textContent.toLowerCase()}`;
+    function inicializarNavegacion() {
+      document.querySelectorAll('.menu-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+          const section = this.getAttribute('data-section');
+          console.log("Cambiando a sección:", section);
           
-          // Inicializar datos específicos de la sección
-          if (section === 'marketing') renderizarCupones();
-          if (section === 'envios') renderizarZonasEnvio();
-          if (section === 'configuracion') cargarConfiguracion();
-        }
-        
-        const titles = {
-          'dashboard': ['📊 Dashboard', 'Resumen general de tu tienda'],
-          'productos': ['📦 Productos', 'Gestión de productos'],
-          'agregar-producto': ['➕ Agregar Producto', 'Crear nuevo producto'],
-          'pedidos': ['🛒 Pedidos', 'Gestión de pedidos'],
-          'clientes': ['👥 Clientes', 'Gestión de clientes'],
-          'administradores': ['👔 Administradores', 'Gestión de administradores'],
-          'configuracion': ['⚙️ Configuración', 'Ajustes de la tienda']
-        };
-        
-        if (titles[section]) {
-          document.getElementById('pageTitle').textContent = titles[section][0];
-          document.getElementById('pageSubtitle').textContent = titles[section][1];
-        }
-        
-        if (window.innerWidth <= 1024) {
-          document.getElementById('sidebar').classList.remove('open');
-        }
+          // Actualizar menú activo
+          document.querySelectorAll('.menu-item').forEach(mi => mi.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Actualizar sección activa
+          document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+          const targetSection = document.getElementById(section);
+          
+          if (targetSection) {
+            targetSection.classList.add('active');
+            
+            // Actualizar títulos
+            const titles = {
+              'dashboard': ['📊 Dashboard', 'Resumen general de tu tienda'],
+              'productos': ['📦 Productos', 'Gestión de productos'],
+              'agregar-producto': ['➕ Agregar Producto', 'Crear nuevo producto'],
+              'pedidos': ['🛒 Pedidos', 'Gestión de pedidos'],
+              'clientes': ['👥 Clientes', 'Gestión de clientes'],
+              'administradores': ['👔 Administradores', 'Gestión de administradores'],
+              'configuracion': ['⚙️ Configuración', 'Ajustes de la tienda']
+            };
+            
+            if (titles[section]) {
+              document.getElementById('pageTitle').textContent = titles[section][0];
+              document.getElementById('pageSubtitle').textContent = titles[section][1];
+            }
+            
+            // Inicializar datos específicos de la sección
+            if (section === 'marketing') renderizarCupones();
+            if (section === 'envios') renderizarZonasEnvio();
+            if (section === 'configuracion') cargarConfiguracion();
+            if (section === 'administradores') renderAdmins();
+          }
+          
+          // Cerrar sidebar en móvil
+          const sidebar = document.getElementById('sidebar');
+          if (sidebar && window.innerWidth <= 1024) {
+            sidebar.classList.remove('open');
+          }
+        });
       });
-    });
+    }
+    inicializarNavegacion();
 
     function toggleSidebar() {
       document.getElementById('sidebar').classList.toggle('open');
@@ -1553,26 +1576,26 @@
 
     // ============ ADMINISTRADORES ============
     function verificarPermisosAdmin() {
-      const menuAdmin = document.querySelector('[data-section="administradores"]');
+      const menuAdmin = document.getElementById('menuItemAdmins');
       const btnAgregarAdmin = document.getElementById('btnAgregarAdmin');
       const btnDesloguearTodos = document.getElementById('btnDesloguearTodos');
       
+      if (!menuAdmin) return;
+
       if (currentProfile.role === 'owner') {
-        if (menuAdmin) menuAdmin.style.display = 'flex';
+        menuAdmin.style.display = 'flex';
         if (btnAgregarAdmin) btnAgregarAdmin.style.display = 'inline-flex';
         if (btnDesloguearTodos) btnDesloguearTodos.style.display = 'inline-flex';
       } else {
-        if (menuAdmin) menuAdmin.style.display = 'none';
+        menuAdmin.style.display = 'none';
         if (btnAgregarAdmin) btnAgregarAdmin.style.display = 'none';
         if (btnDesloguearTodos) btnDesloguearTodos.style.display = 'none';
         
-        // Si está en la sección de administradores y no es owner, redirigir al dashboard
         const activeSection = document.querySelector('.section.active');
         if (activeSection && activeSection.id === 'administradores') {
           document.querySelector('[data-section="dashboard"]').click();
         }
       }
-    } renderAdmins(); // Re-renderizar para aplicar visibilidad de acciones
     }
 
     function toggleRoleMenu(element) {
@@ -1683,7 +1706,7 @@
       try {
         const { error } = await supabase
           .from('administradores')
-          .insert([{ id, name: id, role, email, pass, sesion_activa: true }]);
+          .insert([{ id, role, email, pass, sesion_activa: true }]);
         
         if (error) throw error;
         
