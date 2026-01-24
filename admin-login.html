@@ -127,7 +127,7 @@
           throw new Error("Tu sesión ha sido desactivada");
         }
 
-        // Guardar sesión
+        // Guardar sesión (Usamos id como name ya que no hay columna name)
         const session = {
           id: data.id,
           role: data.role,
@@ -137,8 +137,7 @@
         };
         localStorage.setItem('flashbuy_admin_session', JSON.stringify(session));
 
-        // REDIRECCIÓN FORZADA
-        console.log("Login exitoso, redirigiendo...");
+        // Redirección inmediata
         window.location.href = 'admin-data001.html';
 
       } catch (e) {

@@ -896,21 +896,21 @@
     document.addEventListener('DOMContentLoaded', async function() {
       console.log("Inicializando Dashboard...");
       
-      // Cargar perfil desde la sesión si existe
+      // 1. Cargar perfil desde la sesión
       const session = localStorage.getItem('flashbuy_admin_session');
       if (session) {
         try {
-          const sessionData = JSON.parse(session);
-          if (sessionData && sessionData.id) {
-            currentProfile = sessionData;
-            console.log("Sesión cargada para:", currentProfile.id);
-          }
+          currentProfile = JSON.parse(session);
+          console.log("Sesión cargada para:", currentProfile.id);
         } catch (e) {
           console.error("Error cargando sesión:", e);
         }
       }
 
-      // Cargar datos desde Supabase
+      // 2. Inicializar Navegación ANTES de cargar datos para que los botones funcionen ya
+      inicializarNavegacion();
+
+      // 3. Cargar datos desde Supabase
       try {
         await Promise.all([
           cargarProductosDesdeSupabase(),
@@ -923,7 +923,7 @@
         console.error("Error en carga inicial:", err);
       }
 
-      // Renderizar y configurar
+      // 4. Renderizar y configurar
       actualizarPerfilActual();
       verificarPermisosAdmin();
       
@@ -1000,11 +1000,18 @@
 
     // ============ NAVEGACIÓN ============
     function inicializarNavegacion() {
-      document.querySelectorAll('.menu-item').forEach(item => {
-        item.addEventListener('click', function(e) {
+      const menuItems = document.querySelectorAll('.menu-item');
+      console.log("Configurando clics en", menuItems.length, "menús");
+      
+      menuItems.forEach(item => {
+        // Eliminar eventos previos para evitar duplicados
+        const newItem = item.cloneNode(true);
+        item.parentNode.replaceChild(newItem, item);
+        
+        newItem.addEventListener('click', function(e) {
           e.preventDefault();
           const section = this.getAttribute('data-section');
-          console.log("Cambiando a sección:", section);
+          console.log("Clic en sección:", section);
           
           // Actualizar menú activo
           document.querySelectorAll('.menu-item').forEach(mi => mi.classList.remove('active'));
@@ -1048,7 +1055,6 @@
         });
       });
     }
-    inicializarNavegacion();
 
     function toggleSidebar() {
       document.getElementById('sidebar').classList.toggle('open');
