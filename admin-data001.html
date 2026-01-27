@@ -907,7 +907,7 @@
         }
       }
 
-      // 2. Inicializar Navegación ANTES de cargar datos para que los botones funcionen ya
+      // 2. Inicializar Navegación
       inicializarNavegacion();
 
       // 3. Cargar datos desde Supabase
@@ -933,6 +933,15 @@
       inicializarDragDrop();
       renderAdmins();
       cargarConfiguracion();
+      
+      // Forzar la sección inicial
+      const defaultSection = document.querySelector('.menu-item.active') || document.querySelector('.menu-item');
+      if (defaultSection) {
+        const sectionId = defaultSection.getAttribute('data-section');
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(sectionId);
+        if (target) target.classList.add('active');
+      }
       
       console.log("Dashboard listo.");
     });
@@ -960,11 +969,21 @@
           .select('*')
           .order('id', { ascending: true });
         
-        if (error) throw error;
+        if (error) {
+          console.warn('Error cargando administradores de Supabase, usando locales:', error);
+          // Si falla la tabla, al menos mantener el perfil actual
+          if (adminProfiles.length === 0) {
+            adminProfiles = [currentProfile];
+          }
+          return;
+        }
         adminProfiles = data || [];
+        console.log("Administradores cargados:", adminProfiles.length);
       } catch (error) {
-        console.error('Error cargando administradores:', error);
-        adminProfiles = [];
+        console.error('Error crítico cargando administradores:', error);
+        if (adminProfiles.length === 0) {
+          adminProfiles = [currentProfile];
+        }
       }
     }
 
@@ -1004,13 +1023,11 @@
       console.log("Configurando clics en", menuItems.length, "menús");
       
       menuItems.forEach(item => {
-        // Eliminar eventos previos para evitar duplicados
-        const newItem = item.cloneNode(true);
-        item.parentNode.replaceChild(newItem, item);
-        
-        newItem.addEventListener('click', function(e) {
+        item.addEventListener('click', function(e) {
           e.preventDefault();
           const section = this.getAttribute('data-section');
+          if (!section) return;
+          
           console.log("Clic en sección:", section);
           
           // Actualizar menú activo
@@ -1048,16 +1065,21 @@
           }
           
           // Cerrar sidebar en móvil
-          const sidebar = document.getElementById('sidebar');
+          const sidebar = document.querySelector('.sidebar');
           if (sidebar && window.innerWidth <= 1024) {
-            sidebar.classList.remove('open');
+            sidebar.style.transform = 'translateX(-100%)';
           }
         });
       });
     }
 
     function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('open');
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar.style.transform === 'translateX(0%)' || sidebar.style.transform === '') {
+        sidebar.style.transform = 'translateX(-100%)';
+      } else {
+        sidebar.style.transform = 'translateX(0%)';
+      }
     }
 
     // ============ GESTIÓN DE IMÁGENES - MEJORADO ============
@@ -1704,15 +1726,15 @@
       const role = document.getElementById('newAdminRole').value;
       const pass = document.getElementById('newAdminPass').value;
       
-      if (adminProfiles.find(a => a.id === id)) {
-        alert('❌ El ID de usuario ya existe');
+      if (!pass || pass.length < 6) {
+        alert('❌ La contraseña debe tener al menos 6 caracteres');
         return;
       }
-
+      
       try {
         const { error } = await supabase
           .from('administradores')
-          .insert([{ id, role, email, pass, sesion_activa: true }]);
+          .insert([{ id, email, role, pass, sesion_activa: true }]);
         
         if (error) throw error;
         
@@ -1721,8 +1743,8 @@
         cerrarModalAgregarAdmin();
         alert('✅ Administrador agregado correctamente');
       } catch (error) {
-        console.error('Error agregando administrador:', error);
-        alert('❌ Error al agregar el administrador.');
+        console.error('Error agregando admin:', error);
+        alert('❌ Error al agregar el administrador: ' + (error.message || 'Error desconocido'));
       }
     }
 

@@ -321,8 +321,8 @@
 
 <script>
 const SUPABASE_URL = 'https://wjvhvcwnkawjtreavirm.supabase.co';
-const SUPABASE_KEY = 'TU_PUBLIC_ANON_KEY';
-const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indqdmh2Y3dua2F3anRyZWF2aXJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNzA0MTQsImV4cCI6MjA4NDg0NjQxNH0.gKj9eBsXKoJG5PePRZyt-Vm8oQfbYXKOb77biE32nxg';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Auto redirect si ya hay sesión
 document.addEventListener('DOMContentLoaded', () => {
@@ -343,32 +343,43 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   btn.classList.add('loading');
 
   try {
-    const { data, error } = await supabase.rpc('admin_login', {
-      p_id: username,
-      p_password: password
-    });
+    // Intentar obtener el administrador directamente de la tabla si RPC falla o no existe
+    let { data: adminData, error: adminError } = await supabase
+      .from('administradores')
+      .select('*')
+      .eq('id', username)
+      .eq('pass', password)
+      .single();
 
-    if (error || !data || data.length === 0) {
-      mostrarError('Usuario o contraseña incorrectos');
-      return;
+    if (adminError || !adminData) {
+      // Intentar con RPC por si acaso
+      const { data: rpcData, error: rpcError } = await supabase.rpc('admin_login', {
+        p_id: username,
+        p_password: password
+      });
+      
+      if (rpcError || !rpcData || rpcData.length === 0) {
+        mostrarError('Usuario o contraseña incorrectos');
+        return;
+      }
+      adminData = rpcData[0];
     }
 
-    const admin = data[0];
-
-    if (!admin.sesion_activa) {
+    if (!adminData.sesion_activa) {
       mostrarError('Cuenta desactivada');
       return;
     }
 
     localStorage.setItem('flashbuy_admin_session', JSON.stringify({
-      id: admin.id,
-      name: admin.name,
-      email: admin.email,
-      role: admin.role,
+      id: adminData.id,
+      name: adminData.name || adminData.id,
+      email: adminData.email,
+      role: adminData.role,
       loginTime: new Date().toISOString()
     }));
 
-    window.location.href = 'admin-data001.html';
+    console.log("Login exitoso, redirigiendo...");
+    window.location.replace('admin-data001.html');
 
   } catch (err) {
     console.error(err);
