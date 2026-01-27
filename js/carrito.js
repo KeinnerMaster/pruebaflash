@@ -1,4 +1,5 @@
-// carrito.js - sistema completo de carrito
+// carrito.js - sistema completo de carrito con Supabase
+
 function formatBRL(n) {
     return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
@@ -11,7 +12,35 @@ function saveCart(cart) {
     localStorage.setItem('flashbuy_cart', JSON.stringify(cart));
 }
 
-function renderCart() {
+async function fetchCoupons() {
+    try {
+        const { data, error } = await window.supabase
+            .from('coupons')
+            .select('*')
+            .eq('active', true);
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error fetching coupons:', error);
+        return [];
+    }
+}
+
+async function fetchShippingZones() {
+    try {
+        const { data, error } = await window.supabase
+            .from('shipping_zones')
+            .select('*')
+            .eq('active', true);
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error fetching shipping zones:', error);
+        return [];
+    }
+}
+
+async function renderCart() {
     const container = document.getElementById('cart-contents');
     if (!container) return;
     
@@ -41,7 +70,8 @@ function renderCart() {
                 <img src="${item.imagen}" alt="${item.nombre}">
                 <div class="cart-item-info">
                     <h4>${item.nombre}</h4>
-                    <p>Categoría: ${item.categoria}</p>
+                    ${item.color ? `<p>Color: ${item.color}</p>` : ''}
+                    ${item.talla ? `<p>Talla: ${item.talla}</p>` : ''}
                     <p class="cart-item-price">${formatBRL(item.precio)} c/u</p>
                     <div class="quantity-display">
                         <button class="btn-minus" onclick="updateQuantity(${index}, -1)">-</button>
@@ -62,8 +92,15 @@ function renderCart() {
     
     html += '</div>';
     
-    // Calcular envío (ejemplo)
-    const envio = subtotal > 200 ? 0 : 15.00;
+    // Calcular envío (ejemplo dinámico si hay zonas)
+    const zones = await fetchShippingZones();
+    let envio = subtotal > 200 ? 0 : 15.00;
+    
+    if (zones.length > 0) {
+        // Podríamos dejar que el usuario elija zona, por ahora usamos la primera activa o el default
+        envio = subtotal > 200 ? 0 : parseFloat(zones[0].price);
+    }
+
     const total = subtotal + envio;
     
     html += `
@@ -78,6 +115,13 @@ function renderCart() {
                 <span>${envio === 0 ? 'GRATIS' : formatBRL(envio)}</span>
             </div>
             ${envio === 0 ? '<p style="color:#25D366;font-size:14px;margin:8px 0;">✓ ¡Envío gratis en compras mayores a R$ 200!</p>' : ''}
+            
+            <div id="coupon-section" style="margin: 15px 0; padding: 10px; background: #fff; border-radius: 6px;">
+                <input type="text" id="coupon-code" placeholder="Código de cupón" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; width: 60%;">
+                <button onclick="applyCoupon()" style="padding: 8px 12px; background: #FF7A00; color: white; border: none; border-radius: 4px; cursor: pointer;">Aplicar</button>
+                <div id="coupon-message" style="font-size: 12px; margin-top: 5px;"></div>
+            </div>
+
             <div class="total-row final">
                 <span>Total:</span>
                 <span>${formatBRL(total)}</span>
@@ -95,6 +139,35 @@ function renderCart() {
     `;
     
     container.innerHTML = html;
+}
+
+async function applyCoupon() {
+    const code = document.getElementById('coupon-code').value.trim();
+    const messageDiv = document.getElementById('coupon-message');
+    if (!code) return;
+
+    try {
+        const { data: coupon, error } = await window.supabase
+            .from('coupons')
+            .select('*')
+            .eq('code', code)
+            .eq('active', true)
+            .single();
+
+        if (error || !coupon) {
+            messageDiv.style.color = 'red';
+            messageDiv.textContent = 'Cupón inválido o expirado';
+            return;
+        }
+
+        messageDiv.style.color = 'green';
+        messageDiv.textContent = `Cupón aplicado: ${coupon.discount_type === 'percentage' ? coupon.discount_value + '%' : formatBRL(coupon.discount_value)} de descuento`;
+        
+        // Aquí se aplicaría el descuento al total (lógica simplificada para el ejemplo)
+        // En una implementación real, guardaríamos el cupón en el estado y recalcularíamos el total
+    } catch (error) {
+        console.error('Error applying coupon:', error);
+    }
 }
 
 function updateQuantity(index, change) {
@@ -143,7 +216,6 @@ function finalizarCompra() {
         return;
     }
     
-    // Crear mensaje para WhatsApp
     let mensaje = '🛒 *Nuevo Pedido FlashBuy*\n\n';
     let total = 0;
     
@@ -151,6 +223,8 @@ function finalizarCompra() {
         const subtotal = item.precio * item.cantidad;
         total += subtotal;
         mensaje += `• ${item.nombre}\n`;
+        if (item.color) mensaje += `  Color: ${item.color}\n`;
+        if (item.talla) mensaje += `  Talla: ${item.talla}\n`;
         mensaje += `  Cantidad: ${item.cantidad}\n`;
         mensaje += `  Precio: ${formatBRL(item.precio)} c/u\n`;
         mensaje += `  Subtotal: ${formatBRL(subtotal)}\n\n`;
@@ -167,12 +241,11 @@ function finalizarCompra() {
     window.open(whatsappURL, '_blank');
 }
 
-// Cargar carrito al iniciar la página
 document.addEventListener('DOMContentLoaded', renderCart);
 
-// Exponer funciones globalmente
 window.renderCart = renderCart;
 window.removeItem = removeItem;
 window.updateQuantity = updateQuantity;
 window.clearCart = clearCart;
 window.finalizarCompra = finalizarCompra;
+window.applyCoupon = applyCoupon;

@@ -1,4 +1,4 @@
-// detalle-producto.js - Gestión de la página de detalle del producto
+// detalle-producto.js - Gestión de la página de detalle del producto con Supabase
 
 let currentProduct = null;
 let currentImageIndex = 0;
@@ -17,8 +17,8 @@ function formatBRL(n) {
   return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
-// Cargar información del producto
-function loadProductDetail() {
+// Cargar información del producto desde Supabase
+async function loadProductDetail() {
   const productId = getProductIdFromURL();
   
   if (!productId) {
@@ -27,47 +27,55 @@ function loadProductDetail() {
     return;
   }
 
-  // Buscar producto en el array de productos
-  currentProduct = productos.find(p => p.id === productId);
-  
-  if (!currentProduct) {
-    alert('Producto no encontrado');
+  try {
+    const { data: product, error } = await window.supabase
+      .from('products')
+      .select('*')
+      .eq('id', productId)
+      .single();
+
+    if (error || !product) {
+      throw new Error('Producto no encontrado');
+    }
+
+    currentProduct = product;
+
+    // Actualizar breadcrumb
+    document.getElementById('breadcrumb-categoria').href = `productos.html?categoria=${currentProduct.categoria}`;
+    document.getElementById('breadcrumb-categoria').textContent = currentProduct.categoria;
+    document.getElementById('breadcrumb-producto').textContent = currentProduct.nombre;
+
+    // Actualizar información del producto
+    document.getElementById('product-name').textContent = currentProduct.nombre;
+    document.getElementById('product-price').textContent = formatBRL(currentProduct.precio);
+    document.getElementById('product-category').textContent = currentProduct.categoria;
+    
+    // Actualizar stock
+    updateStockDisplay();
+
+    // Cargar descripción
+    document.getElementById('product-description').textContent = currentProduct.descripcion || '';
+
+    // Cargar galería de imágenes
+    loadGallery();
+
+    // Cargar opciones (color, talla)
+    loadOptions();
+
+    // Cargar productos relacionados
+    loadRelatedProducts();
+  } catch (error) {
+    console.error('Error loading product detail:', error);
+    alert('Error al cargar el producto');
     window.location.href = 'productos.html';
-    return;
   }
-
-  // Actualizar breadcrumb
-  document.getElementById('breadcrumb-categoria').href = `productos.html?categoria=${currentProduct.categoria}`;
-  document.getElementById('breadcrumb-categoria').textContent = currentProduct.categoria;
-  document.getElementById('breadcrumb-producto').textContent = currentProduct.nombre;
-
-  // Actualizar información del producto
-  document.getElementById('product-name').textContent = currentProduct.nombre;
-  document.getElementById('product-price').textContent = formatBRL(currentProduct.precio);
-  document.getElementById('product-category').textContent = currentProduct.categoria;
-  
-  // Actualizar stock
-  updateStockDisplay();
-
-  // Cargar descripción (si existe en el producto, sino usar una genérica)
-  const description = currentProduct.descripcion || 
-    `${currentProduct.nombre} - Producto de alta calidad en la categoría ${currentProduct.categoria}. Perfecta relación calidad-precio.`;
-  document.getElementById('product-description').textContent = description;
-
-  // Cargar galería de imágenes
-  loadGallery();
-
-  // Cargar opciones (color, talla) si existen
-  loadOptions();
-
-  // Cargar productos relacionados
-  loadRelatedProducts();
 }
 
 // Cargar galería de imágenes
 function loadGallery() {
-  // Por ahora usaremos la imagen principal, pero aquí puedes agregar múltiples imágenes
-  const images = currentProduct.imagenes || [currentProduct.imagen];
+  const images = currentProduct.imagenes && currentProduct.imagenes.length > 0 
+    ? currentProduct.imagenes 
+    : [currentProduct.imagen];
   
   // Imagen principal
   document.getElementById('main-image').src = images[0];
@@ -88,7 +96,9 @@ function loadGallery() {
 
 // Seleccionar imagen
 function selectImage(index) {
-  const images = currentProduct.imagenes || [currentProduct.imagen];
+  const images = currentProduct.imagenes && currentProduct.imagenes.length > 0 
+    ? currentProduct.imagenes 
+    : [currentProduct.imagen];
   currentImageIndex = index;
   
   document.getElementById('main-image').src = images[index];
@@ -112,13 +122,9 @@ function loadOptions() {
       colorOption.className = 'color-option';
       colorOption.style.backgroundColor = color.hex;
       colorOption.title = color.nombre;
-      colorOption.onclick = () => selectColor(color.nombre);
+      colorOption.onclick = (e) => selectColor(color.nombre, e.target);
       colorContainer.appendChild(colorOption);
     });
-
-    // Seleccionar primer color por defecto
-    selectedColor = currentProduct.colores[0].nombre;
-    colorContainer.firstChild.classList.add('selected');
   }
 
   // Tallas
@@ -131,28 +137,28 @@ function loadOptions() {
       const sizeOption = document.createElement('div');
       sizeOption.className = 'size-option';
       sizeOption.textContent = size;
-      sizeOption.onclick = () => selectSize(size);
+      sizeOption.onclick = (e) => selectSize(size, e.target);
       sizeContainer.appendChild(sizeOption);
     });
   }
 }
 
 // Seleccionar color
-function selectColor(colorName) {
+function selectColor(colorName, element) {
   selectedColor = colorName;
   document.querySelectorAll('.color-option').forEach(option => {
     option.classList.remove('selected');
   });
-  event.target.classList.add('selected');
+  element.classList.add('selected');
 }
 
 // Seleccionar talla
-function selectSize(size) {
+function selectSize(size, element) {
   selectedSize = size;
   document.querySelectorAll('.size-option').forEach(option => {
     option.classList.remove('selected');
   });
-  event.target.classList.add('selected');
+  element.classList.add('selected');
 }
 
 // Cambiar cantidad
@@ -160,10 +166,7 @@ function changeQuantity(change) {
   const input = document.getElementById('quantity-input');
   const newValue = quantity + change;
   
-  if (newValue < 1) {
-    alert('La cantidad mínima es 1');
-    return;
-  }
+  if (newValue < 1) return;
   
   if (newValue > currentProduct.stock) {
     alert(`Stock máximo disponible: ${currentProduct.stock} unidades`);
@@ -231,7 +234,12 @@ function addToCart() {
     existingItem.cantidad += quantity;
   } else {
     const cartItem = {
-      ...currentProduct,
+      id: currentProduct.id,
+      nombre: currentProduct.nombre,
+      precio: currentProduct.precio,
+      imagen: currentProduct.imagen,
+      categoria: currentProduct.categoria,
+      stock: currentProduct.stock,
       cantidad: quantity
     };
     
@@ -243,25 +251,12 @@ function addToCart() {
 
   // Guardar carrito
   localStorage.setItem('flashbuy_cart', JSON.stringify(carrito));
-
-  // Mostrar confirmación
-  const options = [];
-  if (selectedColor) options.push(`Color: ${selectedColor}`);
-  if (selectedSize) options.push(`Talla: ${selectedSize}`);
-  
-  const optionsText = options.length > 0 ? `\n${options.join(', ')}` : '';
-  alert(`✓ Agregado al carrito:\n${currentProduct.nombre}${optionsText}\nCantidad: ${quantity}`);
-  
-  // Preguntar si quiere ir al carrito
-  if (confirm('¿Deseas ir al carrito?')) {
-    window.location.href = 'carrito.html';
-  }
+  alert('Producto agregado al carrito');
 }
 
 // Comprar ahora
 function buyNow() {
   addToCart();
-  // Después de agregar al carrito, redirigir directamente
   setTimeout(() => {
     window.location.href = 'carrito.html';
   }, 100);
@@ -271,7 +266,9 @@ function buyNow() {
 function openZoom() {
   const modal = document.getElementById('zoom-modal');
   const zoomImage = document.getElementById('zoom-image');
-  const images = currentProduct.imagenes || [currentProduct.imagen];
+  const images = currentProduct.imagenes && currentProduct.imagenes.length > 0 
+    ? currentProduct.imagenes 
+    : [currentProduct.imagen];
   
   zoomImage.src = images[currentImageIndex];
   modal.classList.add('active');
@@ -285,59 +282,63 @@ function closeZoom() {
 }
 
 function prevImage() {
-  const images = currentProduct.imagenes || [currentProduct.imagen];
+  const images = currentProduct.imagenes && currentProduct.imagenes.length > 0 
+    ? currentProduct.imagenes 
+    : [currentProduct.imagen];
   currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
   selectImage(currentImageIndex);
   document.getElementById('zoom-image').src = images[currentImageIndex];
 }
 
 function nextImage() {
-  const images = currentProduct.imagenes || [currentProduct.imagen];
+  const images = currentProduct.imagenes && currentProduct.imagenes.length > 0 
+    ? currentProduct.imagenes 
+    : [currentProduct.imagen];
   currentImageIndex = (currentImageIndex + 1) % images.length;
   selectImage(currentImageIndex);
   document.getElementById('zoom-image').src = images[currentImageIndex];
 }
 
 // Cargar productos relacionados
-function loadRelatedProducts() {
+async function loadRelatedProducts() {
   const relatedContainer = document.getElementById('related-products-list');
   
-  // Filtrar productos de la misma categoría, excluyendo el actual
-  const relatedProducts = productos
-    .filter(p => p.categoria === currentProduct.categoria && p.id !== currentProduct.id)
-    .slice(0, 4);
+  try {
+    const { data: relatedProducts, error } = await window.supabase
+      .from('products')
+      .select('*')
+      .eq('categoria', currentProduct.categoria)
+      .neq('id', currentProduct.id)
+      .limit(4);
 
-  relatedContainer.innerHTML = '';
+    if (error) throw error;
 
-  if (relatedProducts.length === 0) {
-    relatedContainer.innerHTML = '<p style="text-align:center;grid-column:1/-1;">No hay productos relacionados disponibles.</p>';
-    return;
+    relatedContainer.innerHTML = '';
+
+    if (!relatedProducts || relatedProducts.length === 0) {
+      relatedContainer.innerHTML = '<p style="text-align:center;grid-column:1/-1;">No hay productos relacionados disponibles.</p>';
+      return;
+    }
+
+    relatedProducts.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "producto-card";
+      div.innerHTML = `
+        <div class="producto-img">
+            <img src="${p.imagen}" alt="${p.nombre}">
+        </div>
+        <div class="producto-info">
+            <h4>${p.nombre}</h4>
+            <p class="precio">${formatBRL(p.precio)}</p>
+            <a href="detalle-producto.html?id=${p.id}" class="btn-detalles">Ver detalles</a>
+        </div>
+      `;
+      relatedContainer.appendChild(div);
+    });
+  } catch (error) {
+    console.error('Error loading related products:', error);
   }
-
-  relatedProducts.forEach(p => {
-    const div = document.createElement("div");
-    div.className = "producto";
-    div.innerHTML = `
-      <img src="${p.imagen}" alt="${p.nombre}" loading="lazy">
-      <h4>${p.nombre}</h4>
-      <p>${formatBRL(p.precio)}</p>
-      <small style="color:#666">Stock: ${p.stock}</small>
-      <button onclick="window.location.href='detalle-producto.html?id=${p.id}'">Ver detalles</button>
-    `;
-    relatedContainer.appendChild(div);
-  });
 }
-
-// Cerrar modal con tecla ESC
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    closeZoom();
-  }
-  if (document.getElementById('zoom-modal').classList.contains('active')) {
-    if (e.key === 'ArrowLeft') prevImage();
-    if (e.key === 'ArrowRight') nextImage();
-  }
-});
 
 // Inicializar cuando cargue la página
 document.addEventListener('DOMContentLoaded', loadProductDetail);

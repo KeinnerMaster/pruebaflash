@@ -119,9 +119,9 @@
 
   </div>
 
-  <!-- Supabase JS Client -->
+    <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
+  <script src="js/supabase-config.js"></script>
   <script src="js/productos.js"></script>
   <script src="js/nav.js"></script>
   <script>
@@ -148,10 +148,9 @@
   <script src="js/tracking.js"></script>
   <!-- SCRIPT GLOBAL DE MANTENIMIENTO -->
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const mantenimientoActivo = localStorage.getItem('flashbuy_mantenimiento') === 'true';
-
-      if (mantenimientoActivo) {
+    document.addEventListener('DOMContentLoaded', async function () {
+      const { data } = await window.supabase.from('site_settings').select('value').eq('key', 'maintenance_mode').single();
+      if (data && data.value === 'true') {
         document.getElementById('maintenancePage').classList.add('active');
         document.getElementById('mainContent').style.display = 'none';
       }
