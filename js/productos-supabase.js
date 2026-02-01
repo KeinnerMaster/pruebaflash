@@ -218,3 +218,4 @@ async function renderProductsPage() {
 }
 
 window.agregar = agregar;
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
