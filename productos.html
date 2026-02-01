@@ -149,7 +149,7 @@
   <!-- SCRIPT GLOBAL DE MANTENIMIENTO -->
   <script>
     document.addEventListener('DOMContentLoaded', async function () {
-      const { data } = await window.supabaseClient.from('site_settings').select('value').eq('key', 'maintenance_mode').single();
+      const { data } = await window.supabase.from('site_settings').select('value').eq('key', 'maintenance_mode').single();
       if (data && data.value === 'true') {
         document.getElementById('maintenancePage').classList.add('active');
         document.getElementById('mainContent').style.display = 'none';
