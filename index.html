@@ -168,9 +168,14 @@
   <!-- Supabase JS Client -->
   
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/productos.js"></script>
-<script src="js/nav.js"></script>
+<script>
+  const supabaseUrl = "https://zoqgexabyljabqafqaaa.supabase.co";
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpvcWdleGFieWxqYWJxYWZxYWFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk4ODQxMDAsImV4cCI6MjA4NTQ2MDEwMH0.1TgbafITIwwXaSgK3p19QtvciiaKusd1nNMyZXI5Xmg";
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  <script src="js/nav.js"></script>
 <script src="js/tracking.js"></script>
+</script>
+
   
   <!-- Script de modo mantenimiento -->
   <script>
