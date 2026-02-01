@@ -28,7 +28,7 @@ async function loadProductDetail() {
   }
 
   try {
-    const { data: product, error } = await window.supabase
+    const { data: product, error } = await window.supabaseClient
       .from('products')
       .select('*')
       .eq('id', productId)
@@ -304,7 +304,7 @@ async function loadRelatedProducts() {
   const relatedContainer = document.getElementById('related-products-list');
   
   try {
-    const { data: relatedProducts, error } = await window.supabase
+    const { data: relatedProducts, error } = await window.supabaseClient
       .from('products')
       .select('*')
       .eq('categoria', currentProduct.categoria)

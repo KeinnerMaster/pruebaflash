@@ -2,7 +2,7 @@
 
 async function fetchProducts() {
     try {
-        const { data, error } = await window.supabase
+        const { data, error } = await window.supabaseClient
             .from('products')
             .select('*')
             .order('created_at', { ascending: false });
@@ -17,7 +17,7 @@ async function fetchProducts() {
 
 async function fetchFeaturedProduct() {
     try {
-        const { data, error } = await window.supabase
+        const { data, error } = await window.supabaseClient
             .from('products')
             .select('*')
             .eq('is_featured', true)
@@ -33,7 +33,7 @@ async function fetchFeaturedProduct() {
 
 async function fetchSiteSettings() {
     try {
-        const { data, error } = await window.supabase
+        const { data, error } = await window.supabaseClient
             .from('site_settings')
             .select('*');
 
@@ -124,7 +124,7 @@ async function renderIndex() {
 // Función para agregar al carrito (adaptada para Supabase)
 async function agregar(id) {
     try {
-        const { data: product, error } = await window.supabase
+        const { data: product, error } = await window.supabaseClient
             .from('products')
             .select('*')
             .eq('id', id)
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Cargar anuncio en todas las páginas
     const announcementContent = document.getElementById('announcement-content');
     if (announcementContent) {
-        const { data } = await window.supabase.from('site_settings').select('value').eq('key', 'announcement_text').single();
+        const { data } = await window.supabaseClient.from('site_settings').select('value').eq('key', 'announcement_text').single();
         if (data) {
             announcementContent.style.setProperty('--text', `'${data.value}'`);
         }
